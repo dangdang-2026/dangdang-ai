@@ -218,3 +218,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# 당당 — 학습 데이터·모델 파일은 깃에 올리지 않는다 (AI Hub 재배포 금지·용량)
+data/
+models/
+*.pt
+*.onnx
+
+# IDE · 맥
+.idea/
+.DS_Store
