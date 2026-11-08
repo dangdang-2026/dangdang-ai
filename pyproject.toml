@@ -5,6 +5,7 @@ description = "당당 AI 서버 — Spring이 부르는 음식 후보·진료 �
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "fastapi>=0.143.2",
+    "onnxruntime>=1.31.1",
     "pydantic-settings>=2.16.0",
     "uvicorn[standard]>=0.54.0",
 ]
@@ -29,6 +30,8 @@ dev = [
     "ruff>=0.17.1",
 ]
 train = [
+    "onnx>=1.23.2",
+    "onnxscript>=0.7.2",
     "torch>=2.15.0",
     "torchvision>=0.29.2",
 ]
