@@ -5,8 +5,11 @@ description = "당당 AI 서버 — Spring이 부르는 음식 후보·진료 �
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "fastapi>=0.143.2",
+    "numpy>=2.4.6",
     "onnxruntime>=1.31.1",
+    "pillow>=13.0.0",
     "pydantic-settings>=2.16.0",
+    "python-multipart>=0.0.33",
     "uvicorn[standard]>=0.54.0",
 ]
 
