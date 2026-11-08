@@ -5,7 +5,7 @@
 ## 준비
 
 ```bash
-uv sync --group train      # torch · torchvision (처음 한 번)
+uv sync --group train      # torch · torchvision · onnx (처음 한 번)
 ```
 
 사진은 레포 **밖** `~/04_Dev/dangdang/aihub-food/`에 둔다. 깃·구글 드라이브·Colab에 올리지 않는다 (AI Hub 데이터는 국내에서만, 재배포 금지).
@@ -21,7 +21,13 @@ uv run --group train python training/split.py \
 # 2) 학습 → models/food.pt · models/labels.json (깃 제외)
 uv run --group train python training/train.py \
   --data ~/04_Dev/dangdang/aihub-food/split5 --epochs 3
+
+# 3) 서버용으로 바꾸기 → models/food.onnx (깃 제외), 사진 5장으로 PyTorch와 후보 순서 비교
+uv run --group train python training/export_onnx.py \
+  --photos ~/04_Dev/dangdang/aihub-food/split5/val
 ```
+
+서버는 `models/food.onnx`·`models/labels.json` 두 파일만 쓴다.
 
 ## 실험 기록
 
