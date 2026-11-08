@@ -20,7 +20,7 @@ class FoodCandidatesResponse(BaseModel):
 
 def verify_internal_token(x_internal_token: Annotated[str | None, Header()] = None) -> None:
     if not settings.internal_token or not secrets.compare_digest(
-            x_internal_token or "", settings.internal_token
+        x_internal_token or "", settings.internal_token
     ):
         raise HTTPException(status_code=401, detail="내부 토큰이 없거나 틀렸습니다")
 
@@ -34,8 +34,8 @@ def get_predictor(request: Request) -> FoodPredictor:
 
 @router.post("/food-candidates", dependencies=[Depends(verify_internal_token)])
 async def food_candidates(
-        image: UploadFile,
-        predictor: Annotated[FoodPredictor, Depends(get_predictor)],
+    image: UploadFile,
+    predictor: Annotated[FoodPredictor, Depends(get_predictor)],
 ) -> FoodCandidatesResponse:
     image_bytes = await image.read(MAX_BYTES + 1)
     if len(image_bytes) > MAX_BYTES:
