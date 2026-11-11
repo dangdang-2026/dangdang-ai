@@ -34,10 +34,13 @@ def build_transforms() -> tuple[transforms.Compose, transforms.Compose]:
     return train_tf, eval_tf
 
 
-def build_model(num_classes: int) -> nn.Module:
+def build_model(num_classes: int, unfreeze: int = 0) -> nn.Module:
     model = efficientnet_b0(weights=EfficientNet_B0_Weights.DEFAULT)
     for param in model.features.parameters():
         param.requires_grad = False  # 이미 잘 보는 눈(앞부분)은 얼린다
+    if unfreeze > 0:
+        for param in model.features[-unfreeze:].parameters():
+            param.requires_grad = True  # 끝쪽 묶음 N개만 풀어서 음식에 맞게 고친다
     model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
     return model
 
@@ -63,6 +66,10 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--init", type=Path)  # 이어서 학습할 food.pt (같은 데이터로 만든 것)
+    parser.add_argument("--unfreeze", type=int, default=0)  # 앞부분 끝쪽 몇 묶음을 풀까 (0~9)
+    parser.add_argument("--backbone-lr", type=float, default=1e-4)  # 푼 앞부분은 작게 고친다
+    parser.add_argument("--cosine", action="store_true")  # 학습률을 epoch마다 조금씩 낮추기
     args = parser.parse_args()
 
     device = "mps" if torch.backends.mps.is_available() else "cpu"
@@ -73,9 +80,23 @@ def main() -> None:
     val_loader = DataLoader(val_set, batch_size=args.batch_size, num_workers=4)
     print(f"device={device} 종={len(train_set.classes)} train={len(train_set)} val={len(val_set)}")
 
-    model = build_model(len(train_set.classes)).to(device)
-    optimizer = torch.optim.AdamW(model.classifier.parameters(), lr=args.lr)
+    model = build_model(len(train_set.classes), args.unfreeze)
+    if args.init:
+        model.load_state_dict(torch.load(args.init, map_location="cpu"))
+        print(f"이어서 학습: {args.init}")
+    model = model.to(device)
+
+    groups = [{"params": list(model.classifier.parameters()), "lr": args.lr}]
+    backbone = [p for p in model.features.parameters() if p.requires_grad]
+    if backbone:
+        groups.append({"params": backbone, "lr": args.backbone_lr})
+    optimizer = torch.optim.AdamW(groups)
+    scheduler = None
+    if args.cosine:
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
     loss_fn = nn.CrossEntropyLoss()
+    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"고치는 숫자 {trainable:,}개 (푼 앞부분 묶음 {args.unfreeze}개)")
 
     args.out.mkdir(parents=True, exist_ok=True)
     best_top1 = 0.0
@@ -90,6 +111,8 @@ def main() -> None:
             loss.backward()
             optimizer.step()
             running_loss += loss.item() * labels.size(0)
+        if scheduler:
+            scheduler.step()
         top1, top3 = evaluate(model, val_loader, device)
         print(
             f"epoch {epoch}: loss {running_loss / len(train_set):.3f} "
