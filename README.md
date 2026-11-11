@@ -19,6 +19,21 @@ uv run uvicorn app.main:app --reload
 uv run ruff check . && uv run ruff format --check .
 uv run pytest
 ```
+## 배포
+
+- `main`에 머지되면 `.github/workflows/cd.yml`이 이미지를 만들어 Docker Hub(`DOCKER_REPO`)에 올린다 (`latest` · 커밋 sha)
+- 서버에서 켜는 건 dangdang-be `docker/docker-compose.yml`의 `ai` 서비스. 밖으로 포트를 열지 않고, Spring만 `http://ai:8000`으로 부른다
+- 모델 파일은 깃 · 이미지에 넣지 않는다 → 서버 `~/dangdang/ai-models/`에 두고 컨테이너 `/app/models`에 읽기 전용으로 붙인다
+- 환경변수 `INTERNAL_TOKEN` — Spring과 같은 값 (dangdang-be Secret `ENV_PROD` → 서버 `.env`). 값은 깃 · PR · 노션에 쓰지 않는다
+
+```bash
+# 모델을 다시 학습했을 때 (맥에서)
+scp models/food.onnx models/labels.json dangdang:~/dangdang/ai-models/
+ssh dangdang 'cd ~/dangdang/docker && docker compose restart ai'
+
+# 새 이미지로 바꿀 때 (main 머지 → Actions CD 초록 뒤)
+ssh dangdang 'cd ~/dangdang/docker && docker compose pull ai && docker compose up -d ai'
+```
 
 ## 구조
 
