@@ -7,6 +7,7 @@ dependencies = [
     "fastapi>=0.143.2",
     "numpy>=2.4.6",
     "onnxruntime>=1.31.1",
+    "openai>=3.51.0",
     "pillow>=13.0.0",
     "pydantic-settings>=2.16.0",
     "python-multipart>=0.0.33",
