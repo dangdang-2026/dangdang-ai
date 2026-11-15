@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from app.core.config import settings
 from app.food.predictor import FoodPredictor
 from app.food.router import router as food_router
+from app.moderation.router import router as moderation_router
 
 
 @asynccontextmanager
@@ -21,6 +22,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 app.include_router(food_router)
+app.include_router(moderation_router)
 
 
 @app.get("/health")
