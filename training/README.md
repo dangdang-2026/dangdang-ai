@@ -27,6 +27,10 @@ uv run --group train python training/train.py \
   --data ~/04_Dev/dangdang/aihub-food/split150 --epochs 5 --init 백업폴더/food.pt \
   --unfreeze 3 --lr 3e-4 --backbone-lr 1e-4 --cosine
 
+# 2-2) Hugging Face(timm) 모델로 학습 → food.pt · labels.json · food.onnx 까지 (3)은 건너뜀)
+uv run --group train python -m training.train_timm \
+  --data ~/04_Dev/dangdang/aihub-food/split150 --epochs 3
+
 # 3) 서버용으로 바꾸기 → models/food.onnx (깃 제외), 사진 5장으로 PyTorch와 후보 순서 비교
 uv run --group train python training/export_onnx.py \
   --photos ~/04_Dev/dangdang/aihub-food/split5/val
@@ -39,11 +43,12 @@ uv run python -m training.evaluate_my_photos --photos ~/04_Dev/dangdang/my-food/
 
 ## 실험 기록
 
-| 날짜 | 데이터 | 종 | train / val | epoch | val Top-1 | val Top-3 | 메모 |
-|---|---|---|---|---|-------|-------|---|
+| 날짜         | 데이터 | 종 | train / val | epoch | val Top-1 | val Top-3 | 메모 |
+|------------|---|---|---|---|-------|-------|---|
 | 2026-10-30 | AI Hub 5종 (김치볶음밥·비빔밥·김밥·짜장면·떡볶이) | 5 | 4243 / 745 | 3 | 90.3% | 98.8% | 맥 mps, 앞부분 얼림, lr 1e-3 |
 | 2026-11-10 | AI Hub 150종 (종당 300장) | 150 | 38250 / 6750 | 5 | 56.7% | 76.3% | 맥 mps, 앞부분 얼림, lr 1e-3, 내 사진+위키미디어 156장 시험 Top-1 49.6% · Top-3 69.6%, 확신도 기준 0.3 |
 | 2026-11-11 | AI Hub 150종 (종당 300장) | 150 | 38250 / 6750 | 5 | 73.9% | 89.4% | 맥 mps, 11/10 모델에서 이어서, 앞부분 끝 3묶음 풀기(앞 1e-4 · 뒤 3e-4), cosine, epoch당 약 800초, 같은 156장 시험 Top-1 68.0% · Top-3 84.0%, 확신도 기준 0.5 (채택 — 서버 모델 교체) |
+| 2026-11-14 | AI Hub 150종 (종당 300장) | 150 | 38250 / 6750 | 3 | 82.2% | 93.8% | 맥 mps, `timm/convnext_nano.in12k_ft_in1k`(Hugging Face, ImageNet-12k, Apache-2.0), 앞부분 전체 1e-4 · 판단 층 1e-3, cosine, epoch당 약 4,200초, 같은 156장 시험 Top-1 75.2% · Top-3 91.2%, 확신도 기준 0.7, 모델 60MB · CPU 1장 118ms (채택 — 서버 모델 교체) |
 
 ## 데이터 출처
 

@@ -51,7 +51,7 @@ def evaluate(model: nn.Module, loader: DataLoader, device: str) -> tuple[float, 
     with torch.no_grad():
         for images, labels in loader:
             images, labels = images.to(device), labels.to(device)
-            k = min(3, model.classifier[1].out_features)
+            k = min(3, len(loader.dataset.classes))  # 음식이 3종보다 적으면 그 수만큼
             pred = model(images).topk(k, dim=1).indices
             top1 += (pred[:, 0] == labels).sum().item()
             top3 += (pred == labels.unsqueeze(1)).any(dim=1).sum().item()
