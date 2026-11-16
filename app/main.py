@@ -1,8 +1,10 @@
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
 
+from app.chat.router import router as chat_router
 from app.core.config import settings
 from app.food.predictor import FoodPredictor
 from app.food.router import router as food_router
@@ -20,9 +22,13 @@ async def lifespan(app: FastAPI):
     yield
 
 
+# 우리 코드의 log.info(…)도 콘솔에 보이게 (requestId로 Spring 로그와 맞춰 본다)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s : %(message)s")
+
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 app.include_router(food_router)
 app.include_router(moderation_router)
+app.include_router(chat_router)                  
 
 
 @app.get("/health")
