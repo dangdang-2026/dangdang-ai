@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     llm_model: str = (
         "gpt-5.4-nano"  # 위반 감지·챗봇처럼 가벼운 일 (모델 이름은 .env LLM_MODEL로 바꾼다)
     )
+    llm_model_note: str = (
+        "gpt-5.4-mini"  # 진료 메모 정리 — 근거 문장을 정확히 옮겨야 해서 nano보다 한 단계 위
+    )
     food_model_path: str = "models/food.onnx"  # 4단계에서 만든 모델
     food_labels_path: str = "models/labels.json"  # 모델 번호 → 음식 이름
 
