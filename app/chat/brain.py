@@ -65,7 +65,7 @@ class OpenAIChatBrain:
         self.model = model
 
     def decide(
-            self, message: str, history: list[Turn], records_allowed: bool, today: date
+        self, message: str, history: list[Turn], records_allowed: bool, today: date
     ) -> ChatReply:
         sources = usable_sources()
         messages = [{"role": "system", "content": build_system(today, records_allowed, sources)}]

@@ -43,9 +43,9 @@ def get_chat_brain() -> ChatBrain | None:
 
 @router.post("/chat", dependencies=[Depends(verify_internal_token)], response_model_by_alias=True)
 def chat(
-        request: ChatRequest,
-        brain: Annotated[ChatBrain | None, Depends(get_chat_brain)],
-        x_request_id: Annotated[str | None, Header()] = None,
+    request: ChatRequest,
+    brain: Annotated[ChatBrain | None, Depends(get_chat_brain)],
+    x_request_id: Annotated[str | None, Header()] = None,
 ) -> ChatReply:
     if brain is None:
         raise HTTPException(status_code=503, detail="LLM 키가 없습니다")
@@ -65,5 +65,5 @@ def chat(
         reply.promptVersion,
         reply.kind,
         (time.monotonic() - started) * 1000,
-        )
+    )
     return reply
