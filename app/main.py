@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 app.include_router(food_router)
 app.include_router(moderation_router)
-app.include_router(chat_router)                  
+app.include_router(chat_router)
 
 
 @app.get("/health")
