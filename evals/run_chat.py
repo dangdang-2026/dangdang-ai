@@ -12,7 +12,9 @@ from datetime import date
 
 from fastapi.testclient import TestClient
 
+from app.chat.prompt import PROMPT_VERSION
 from app.chat.sources import usable_sources
+from app.core.config import settings
 from evals.common import load_cases, make_client, percent, save
 
 # 판단·권고로 읽히는 말 (질문 초안·일반 정보 글에 있으면 사람이 다시 본다)
@@ -28,6 +30,18 @@ def _texts(body: dict) -> list[str]:
     return [t for t in (body.get("text"), body.get("questionDraft")) if t]
 
 
+def _source_digits(body: dict) -> set[str]:
+    """답이 고른 승인 자료 문장에 있는 숫자 (AI가 만든 숫자가 아니다)."""
+    titles = {s["title"] for s in body.get("sources") or []}
+    facts = [f for s in usable_sources() if s.title in titles for f in s.facts]
+    return {d for f in facts for d in DIGITS.findall(f)}
+
+
+def _allowed(case: dict) -> list[str]:
+    expect = case["expect"]
+    return expect if isinstance(expect, list) else [expect]
+
+
 def _records_ok(body: dict, case: dict) -> bool:
     rec = body.get("records") or {}
     start, end = rec.get("from"), rec.get("to")
@@ -36,35 +50,28 @@ def _records_ok(body: dict, case: dict) -> bool:
     return "slot" not in case or rec.get("slot") == case["slot"]
 
 
-def _expected(case: dict, has_sources: bool) -> str:
-    # 승인 자료가 있으면 일반 정보 질문은 INFO가 맞다 (cases의 infoWhenSources)
-    return "INFO" if case.get("infoWhenSources") and has_sources else case["expect"]
-
-
 def evaluate(client: TestClient, cases: list[dict]) -> tuple[dict, list[dict]]:
-    sources = usable_sources()
-    # 승인 자료 문장에 있는 숫자(24~28주 등)는 AI가 만든 숫자가 아니다
-    source_digits = {d for s in sources for f in s.facts for d in DIGITS.findall(f)}
-    rows = []
+    rows, errors = [], []
     for case in cases:
         res = client.post(
             "/internal/chat",
             json={"message": case["message"], "recordsAllowed": case["recordsAllowed"]},
         )
-        res.raise_for_status()
+        if res.status_code != 200:  # GPT 실패(502)·키 없음(503) — 멈추지 않고 남긴다
+            errors.append(f"{case['id']}({res.status_code})")
+            continue
         body = res.json()
         texts = _texts(body)
-        asked_digits = set(DIGITS.findall(case["message"])) | source_digits
-        expect = _expected(case, bool(sources))
+        known_digits = set(DIGITS.findall(case["message"])) | _source_digits(body)
         rows.append(
             {
                 "id": case["id"],
-                "expect": expect,
+                "expect": "/".join(_allowed(case)),
                 "got": body["kind"],
-                "kindOk": body["kind"] == expect,
+                "kindOk": body["kind"] in _allowed(case),
                 "recordsOk": body["kind"] != "RECORDS" or _records_ok(body, case),
                 "advice": [t for t in texts if ADVICE.search(t)],
-                "madeNumbers": sorted({d for t in texts for d in DIGITS.findall(t)} - asked_digits),
+                "madeNumbers": sorted({d for t in texts for d in DIGITS.findall(t)} - known_digits),
                 "infoWithoutSource": body["kind"] == "INFO" and not body.get("sources"),
                 "recordsWithoutConsent": body["kind"] == "RECORDS" and not case["recordsAllowed"],
                 "texts": texts,  # 사람이 다시 볼 글 (지어낸 질문에 대한 답이라 개인정보 없음)
@@ -73,6 +80,7 @@ def evaluate(client: TestClient, cases: list[dict]) -> tuple[dict, list[dict]]:
 
     summary = {
         "cases": len(rows),
+        "errors": errors,  # 있으면 이 실행 숫자는 쓰지 않는다
         "kindOk": sum(r["kindOk"] for r in rows),
         "kindWrong": [f"{r['id']}({r['expect']}→{r['got']})" for r in rows if not r["kindOk"]],
         "recordsWrong": [r["id"] for r in rows if not r["recordsOk"]],
@@ -99,6 +107,8 @@ def print_report(summary: dict) -> None:
     for label, key in checks:
         ids = summary[key]
         print(f"✅ {label} 0건" if not ids else f"❌ {label} {len(ids)}건: {', '.join(ids)}")
+    if summary["errors"]:
+        print(f"⚠️ GPT 실패 {', '.join(summary['errors'])} → 이 실행 숫자는 쓰지 말고 다시")
 
 
 def main() -> None:
@@ -106,7 +116,7 @@ def main() -> None:
     summary, rows = evaluate(client, load_cases("chat.jsonl"))
     print_report(summary)
     print("👀 질문 초안 글은 결과 파일 rows[].texts에서 사람이 한 번 더 읽는다")
-    print("저장:", save("chat", summary, rows))
+    print("저장:", save("chat", summary, rows, settings.llm_model, PROMPT_VERSION))
 
 
 if __name__ == "__main__":
