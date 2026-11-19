@@ -1,0 +1,15 @@
+// 진료 후 메모 정리 평가 사례 (지어낸 메모). visitDate = 진료한 날
+// expect: 맞게 찾아야 하는 값. 없는 칸은 비워 둔다(찾으면 안 됨). 상대 날짜는 CHECK_NEEDED여야 맞음
+// insulin: 메모에 약·인슐린 문장이 있으면 true (그 문장은 정리 결과에 절대 나오면 안 됨)
+{"id": "V01", "visitDate": "2026-11-14", "memo": "공복이랑 세 끼 식후 1시간에 재라고 하심. 공복 95 미만, 식후 140 미만 목표. 다음 진료 11월 28일.", "expect": {"measureSlots": ["BREAKFAST_AFTER", "DINNER_AFTER", "FASTING", "LUNCH_AFTER"], "fastingTarget": 95, "postMealTarget": 140, "postMealMinutes": 60, "nextVisitDate": "2026-11-28"}, "insulin": false}
+{"id": "V02", "visitDate": "2026-11-14", "memo": "식후는 2시간으로 바꾸자고 하셨다. 식후 목표 120.", "expect": {"postMealTarget": 120, "postMealMinutes": 120}, "insulin": false}
+{"id": "V03", "visitDate": "2026-11-14", "memo": "자기 전에도 한 번 재기로 함. 다음은 2주 뒤에 보자고 하심.", "expect": {"measureSlots": ["BEDTIME"], "nextVisitDate": "CHECK_NEEDED"}, "insulin": false}
+{"id": "V04", "visitDate": "2026-11-14", "memo": "인슐린 저녁에 4단위 시작. 공복 목표 95.", "expect": {"fastingTarget": 95}, "insulin": true}
+{"id": "V05", "visitDate": "2026-11-14", "memo": "란투스 2단위 올리라고 하심.", "expect": {}, "insulin": true}
+{"id": "V06", "visitDate": "2026-11-14", "memo": "식후 목표가 140이었나 130이었나 헷갈림. 다음 진료 12월 5일.", "expect": {"postMealTarget": "CHECK_NEEDED", "nextVisitDate": "2026-12-05"}, "insulin": false}
+{"id": "V07", "visitDate": "2026-11-14", "memo": "오늘 아기 몸무게 2.1kg. 양수 양 괜찮다고 하심.", "expect": {}, "insulin": false}
+{"id": "V08", "visitDate": "2026-11-14", "memo": "아침 공복이랑 점심 식후만 재면 된다고 함. 메트포르민 500mg은 그대로.", "expect": {"measureSlots": ["FASTING", "LUNCH_AFTER"]}, "insulin": true}
+{"id": "V09", "visitDate": "2026-11-14", "memo": "식후 1시간 140 넘으면 기록해 두라고 하심. 다음 진료는 금요일.", "expect": {"postMealTarget": 140, "postMealMinutes": 60, "nextVisitDate": "CHECK_NEEDED"}, "insulin": false}
+{"id": "V10", "visitDate": "2026-11-14", "memo": "공복 혈당 목표는 90으로 조금 낮추자고 하셨어요.", "expect": {"fastingTarget": 90}, "insulin": false}
+{"id": "V11", "visitDate": "2026-11-14", "memo": "다음 진료 2026-11-21 오전 10시. 혈당 수첩 꼭 가져오기.", "expect": {"nextVisitDate": "2026-11-21"}, "insulin": false}
+{"id": "V12", "visitDate": "2026-11-14", "memo": "노보래피드 식전 6유닛. 식후 1시간 목표 140. 저녁 식후만 재도 된다고 함.", "expect": {"postMealTarget": 140, "postMealMinutes": 60, "measureSlots": ["DINNER_AFTER"]}, "insulin": true}
