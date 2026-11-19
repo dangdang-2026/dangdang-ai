@@ -90,9 +90,12 @@ def test_기록_동의가_없으면_기록_도구를_주지_않는다(no_sources
     assert "show_records는 쓸 수 없다" in fake.calls[0]["messages"][0]["content"]
 
 
-def test_동의가_없는데_기록_도구를_부르면_무시한다(no_sources):
+def test_동의가_없는데_기록_도구를_부르면_동의_안내(no_sources):
     fake = FakeOpenAI("show_records", {"from": "2026-11-07", "to": "2026-11-13", "slot": None})
-    assert decide(fake, records_allowed=False).kind == "UNKNOWN"
+    reply = decide(fake, records_allowed=False)
+    assert reply.kind == "UNKNOWN"
+    assert reply.reason == "NO_CONSENT"
+    assert "기록 사용 동의" in reply.text
 
 
 def test_이상한_날짜와_시점은_비운다(no_sources):
@@ -112,6 +115,15 @@ def test_물어볼_말_초안(no_sources):
     assert reply.kind == "QUESTION_DRAFT"
     assert reply.questionDraft == "공복 혈당이 높게 나온 날 무엇을 바꿔야 할까요?"
     assert reply.text == "진료 때 이렇게 물어보면 어떨까요?"
+
+
+def test_걱정하는_말이면_공감하는_첫마디(no_sources):
+    question = "요즘 혈당이 계속 높은데 무엇을 바꿔야 할까요?"
+    fake = FakeOpenAI("draft_question", {"question": question, "worried": True})
+    reply = decide(fake, "나 요즘 혈당이 너무 높아")
+
+    assert reply.kind == "QUESTION_DRAFT"
+    assert reply.text == "걱정되셨죠. 진료 때 이렇게 물어보면 어떨까요?"
 
 
 def test_물어볼_말은_200자로_자른다(no_sources):
@@ -156,6 +168,43 @@ def test_답에_약_용량_숫자가_섞이면_버린다(one_source):
     args = {"answer": "인슐린 8단위가 보통이에요.", "source_ids": ["S1"]}
     fake = FakeOpenAI("answer_from_sources", args)
     assert decide(fake).kind == "UNKNOWN"
+
+
+# ── 답할 수 없을 때 (이유별 문장) ──
+
+
+@pytest.mark.parametrize(
+    ("reason", "phrase"),
+    [
+        ("JUDGMENT", "판단할 수 없어요"),
+        ("NO_SOURCE", "자료에 없어요"),
+        ("CHITCHAT", "언제든 불러 주세요"),
+        ("RUDE", "죄송해요"),
+        ("OFF_TOPIC", "도와드리기 어려워요"),
+    ],
+)
+def test_이유마다_정해진_문장(no_sources, reason, phrase):
+    reply = decide(FakeOpenAI("say_unknown", {"reason": reason}))
+    assert reply.kind == "UNKNOWN"
+    assert reply.reason == reason
+    assert phrase in reply.text
+
+
+def test_모르는_이유나_이유_없음은_자료에_없음으로(no_sources):
+    assert decide(FakeOpenAI("say_unknown", {"reason": "아무거나"})).reason == "NO_SOURCE"
+    assert decide(FakeOpenAI("say_unknown", {})).reason == "NO_SOURCE"
+
+
+def test_동의했는데_동의_필요를_고르면_자료에_없음으로(no_sources):
+    reply = decide(FakeOpenAI("say_unknown", {"reason": "NO_CONSENT"}), records_allowed=True)
+    assert reply.reason == "NO_SOURCE"
+
+
+def test_say_unknown은_이유를_꼭_고르게_한다(no_sources):
+    fake = FakeOpenAI("say_unknown", {"reason": "CHITCHAT"})
+    decide(fake)
+    tool = next(t for t in fake.calls[0]["tools"] if t["function"]["name"] == "say_unknown")
+    assert tool["function"]["parameters"]["required"] == ["reason"]
 
 
 # ── 그 밖 ──
