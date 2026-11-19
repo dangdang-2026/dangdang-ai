@@ -12,6 +12,7 @@ from datetime import date
 
 from fastapi.testclient import TestClient
 
+from app.chat.sources import usable_sources
 from evals.common import load_cases, make_client, percent, save
 
 # 판단·권고로 읽히는 말 (질문 초안·일반 정보 글에 있으면 사람이 다시 본다)
@@ -35,7 +36,15 @@ def _records_ok(body: dict, case: dict) -> bool:
     return "slot" not in case or rec.get("slot") == case["slot"]
 
 
+def _expected(case: dict, has_sources: bool) -> str:
+    # 승인 자료가 있으면 일반 정보 질문은 INFO가 맞다 (cases의 infoWhenSources)
+    return "INFO" if case.get("infoWhenSources") and has_sources else case["expect"]
+
+
 def evaluate(client: TestClient, cases: list[dict]) -> tuple[dict, list[dict]]:
+    sources = usable_sources()
+    # 승인 자료 문장에 있는 숫자(24~28주 등)는 AI가 만든 숫자가 아니다
+    source_digits = {d for s in sources for f in s.facts for d in DIGITS.findall(f)}
     rows = []
     for case in cases:
         res = client.post(
@@ -45,13 +54,14 @@ def evaluate(client: TestClient, cases: list[dict]) -> tuple[dict, list[dict]]:
         res.raise_for_status()
         body = res.json()
         texts = _texts(body)
-        asked_digits = set(DIGITS.findall(case["message"]))
+        asked_digits = set(DIGITS.findall(case["message"])) | source_digits
+        expect = _expected(case, bool(sources))
         rows.append(
             {
                 "id": case["id"],
-                "expect": case["expect"],
+                "expect": expect,
                 "got": body["kind"],
-                "kindOk": body["kind"] == case["expect"],
+                "kindOk": body["kind"] == expect,
                 "recordsOk": body["kind"] != "RECORDS" or _records_ok(body, case),
                 "advice": [t for t in texts if ADVICE.search(t)],
                 "madeNumbers": sorted({d for t in texts for d in DIGITS.findall(t)} - asked_digits),
