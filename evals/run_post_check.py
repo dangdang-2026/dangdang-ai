@@ -11,8 +11,11 @@ import argparse
 
 from fastapi.testclient import TestClient
 
+from app.core.config import settings
 from app.main import app
+from app.moderation.dose_check import PROMPT_VERSION
 from app.moderation.router import get_dose_checker
+from app.moderation.rules import find_hits
 from evals.common import load_cases, make_client, percent, save
 
 KINDS = ("DOSE", "URGENT_MEDICAL", "MIND")
@@ -21,19 +24,19 @@ KINDS = ("DOSE", "URGENT_MEDICAL", "MIND")
 def evaluate(client: TestClient, cases: list[dict]) -> tuple[dict, list[dict]]:
     rows = []
     for case in cases:
-        res = client.post(
-            "/internal/post-check",
-            json={"title": case.get("title", ""), "content": case["content"]},
-        )
-        res.raise_for_status()
+        title = case.get("title", "")
+        res = client.post("/internal/post-check", json={"title": title, "content": case["content"]})
+        res.raise_for_status()  # 글 감지는 GPT가 실패해도 규칙 결과로 200이 온다
         body = res.json()
         got = sorted({issue["kind"] for issue in body["issues"]})
+        rule_dose = any(h.kind == "DOSE" for h in find_hits(title, case["content"]))
         rows.append(
             {
                 "id": case["id"],
                 "expect": sorted(case["expect"]),
                 "got": got,
                 "llmChecked": body["llmChecked"],
+                "gptSkipped": rule_dose and not body["llmChecked"],  # GPT에 물어야 했는데 못 물음
                 "ok": got == sorted(case["expect"]),
             }
         )
@@ -72,16 +75,22 @@ def main() -> None:
     args = parser.parse_args()
 
     client = make_client()
-    if args.rules_only:
+    rules_only = args.rules_only or not settings.llm_api_key  # 키가 없으면 실제로는 규칙만이다
+    if rules_only:
         app.dependency_overrides[get_dose_checker] = lambda: None
     cases = "post_check_fresh.jsonl" if args.fresh else "post_check.jsonl"
     summary, rows = evaluate(client, load_cases(cases))
-    summary["mode"] = "rules-only" if args.rules_only else "rules+gpt"
+    summary["mode"] = "rules-only" if rules_only else "rules+gpt"
     summary["set"] = "fresh" if args.fresh else "calibration"
     summary["llmCheckedCases"] = sum(r["llmChecked"] for r in rows)
+    summary["gptSkipped"] = [] if rules_only else [r["id"] for r in rows if r["gptSkipped"]]
     print_report(summary)
-    print(f"GPT가 확인한 사례 {summary['llmCheckedCases']}개 (0이면 키가 없거나 --rules-only)")
-    print("저장:", save(f"post_check-{summary['set']}-{summary['mode']}", summary, rows))
+    print(f"GPT가 확인한 사례 {summary['llmCheckedCases']}개 (모드: {summary['mode']})")
+    if summary["gptSkipped"]:
+        print(f"⚠️ GPT 확인 실패 {len(summary['gptSkipped'])}건 → 이 실행 숫자는 쓰지 말고 다시")
+    model = None if rules_only else settings.llm_model
+    name = f"post_check-{summary['set']}-{summary['mode']}"
+    print("저장:", save(name, summary, rows, model, None if rules_only else PROMPT_VERSION))
 
 
 if __name__ == "__main__":
