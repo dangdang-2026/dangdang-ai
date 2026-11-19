@@ -42,6 +42,14 @@ def _allowed(case: dict) -> list[str]:
     return expect if isinstance(expect, list) else [expect]
 
 
+def _reason_ok(body: dict, case: dict) -> bool:
+    """UNKNOWN 이유가 맞는지 (이유별로 화면 문장이 다르다). 사례에 reason이 없으면 보지 않는다."""
+    if body["kind"] != "UNKNOWN" or "reason" not in case:
+        return True
+    allowed = case["reason"] if isinstance(case["reason"], list) else [case["reason"]]
+    return body.get("reason") in allowed
+
+
 def _records_ok(body: dict, case: dict) -> bool:
     rec = body.get("records") or {}
     start, end = rec.get("from"), rec.get("to")
@@ -70,6 +78,8 @@ def evaluate(client: TestClient, cases: list[dict]) -> tuple[dict, list[dict]]:
                 "got": body["kind"],
                 "kindOk": body["kind"] in _allowed(case),
                 "recordsOk": body["kind"] != "RECORDS" or _records_ok(body, case),
+                "reason": body.get("reason"),
+                "reasonOk": _reason_ok(body, case),
                 "advice": [t for t in texts if ADVICE.search(t)],
                 "madeNumbers": sorted({d for t in texts for d in DIGITS.findall(t)} - known_digits),
                 "infoWithoutSource": body["kind"] == "INFO" and not body.get("sources"),
@@ -84,6 +94,7 @@ def evaluate(client: TestClient, cases: list[dict]) -> tuple[dict, list[dict]]:
         "kindOk": sum(r["kindOk"] for r in rows),
         "kindWrong": [f"{r['id']}({r['expect']}→{r['got']})" for r in rows if not r["kindOk"]],
         "recordsWrong": [r["id"] for r in rows if not r["recordsOk"]],
+        "reasonWrong": [f"{r['id']}({r['reason']})" for r in rows if not r["reasonOk"]],
         "advice": [r["id"] for r in rows if r["advice"]],
         "madeNumbers": [r["id"] for r in rows if r["madeNumbers"]],
         "infoWithoutSource": [r["id"] for r in rows if r["infoWithoutSource"]],
@@ -98,6 +109,7 @@ def print_report(summary: dict) -> None:
     )
     print(f"종류가 틀린 질문: {', '.join(summary['kindWrong']) or '-'}")
     print(f"기간·시점이 틀린 기록 답: {', '.join(summary['recordsWrong']) or '-'}")
+    print(f"이유가 틀린 「답할 수 없음」: {', '.join(summary['reasonWrong']) or '-'}")
     checks = [
         ("판단·권고로 읽히는 답", "advice"),
         ("AI가 만든 숫자", "madeNumbers"),

@@ -84,7 +84,8 @@ def test_기록_답은_Spring이_읽는_모양으로(use):
         "records": {"from": "2026-11-07", "to": "2026-11-13", "slot": None},
         "questionDraft": None,
         "sources": [],
-        "promptVersion": "chat-v1",
+        "reason": None,
+        "promptVersion": "chat-v2",
     }
     message, history, records_allowed, _ = brain.asked[0]
     assert message == "지난주 기록"
