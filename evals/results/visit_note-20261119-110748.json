@@ -1,0 +1,176 @@
+{
+  "model": "gpt-5.4-mini",
+  "promptVersion": "visit-note-v1",
+  "summary": {
+    "cases": 12,
+    "errors": [],
+    "fieldMarks": {
+      "OK": 17,
+      "CHECK": 2,
+      "EMPTY": 39,
+      "MISSED": 2
+    },
+    "insulinLeak": 0,
+    "ungrounded": 0,
+    "insulinSkippedWrong": [],
+    "wrong": []
+  },
+  "rows": [
+    {
+      "id": "V01",
+      "marks": {
+        "measureSlots": "OK",
+        "fastingTarget": "OK",
+        "postMealTarget": "OK",
+        "postMealMinutes": "OK",
+        "nextVisitDate": "CHECK"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V02",
+      "marks": {
+        "measureSlots": "EMPTY",
+        "fastingTarget": "EMPTY",
+        "postMealTarget": "OK",
+        "postMealMinutes": "OK",
+        "nextVisitDate": "EMPTY"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V03",
+      "marks": {
+        "measureSlots": "OK",
+        "fastingTarget": "EMPTY",
+        "postMealTarget": "EMPTY",
+        "postMealMinutes": "EMPTY",
+        "nextVisitDate": "OK"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V04",
+      "marks": {
+        "measureSlots": "EMPTY",
+        "fastingTarget": "OK",
+        "postMealTarget": "EMPTY",
+        "postMealMinutes": "EMPTY",
+        "nextVisitDate": "EMPTY"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V05",
+      "marks": {
+        "measureSlots": "EMPTY",
+        "fastingTarget": "EMPTY",
+        "postMealTarget": "EMPTY",
+        "postMealMinutes": "EMPTY",
+        "nextVisitDate": "EMPTY"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V06",
+      "marks": {
+        "measureSlots": "EMPTY",
+        "fastingTarget": "EMPTY",
+        "postMealTarget": "MISSED",
+        "postMealMinutes": "EMPTY",
+        "nextVisitDate": "CHECK"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V07",
+      "marks": {
+        "measureSlots": "EMPTY",
+        "fastingTarget": "EMPTY",
+        "postMealTarget": "EMPTY",
+        "postMealMinutes": "EMPTY",
+        "nextVisitDate": "EMPTY"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V08",
+      "marks": {
+        "measureSlots": "OK",
+        "fastingTarget": "EMPTY",
+        "postMealTarget": "EMPTY",
+        "postMealMinutes": "EMPTY",
+        "nextVisitDate": "EMPTY"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V09",
+      "marks": {
+        "measureSlots": "EMPTY",
+        "fastingTarget": "EMPTY",
+        "postMealTarget": "OK",
+        "postMealMinutes": "OK",
+        "nextVisitDate": "MISSED"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V10",
+      "marks": {
+        "measureSlots": "EMPTY",
+        "fastingTarget": "OK",
+        "postMealTarget": "EMPTY",
+        "postMealMinutes": "EMPTY",
+        "nextVisitDate": "EMPTY"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V11",
+      "marks": {
+        "measureSlots": "EMPTY",
+        "fastingTarget": "EMPTY",
+        "postMealTarget": "EMPTY",
+        "postMealMinutes": "EMPTY",
+        "nextVisitDate": "OK"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    },
+    {
+      "id": "V12",
+      "marks": {
+        "measureSlots": "OK",
+        "fastingTarget": "EMPTY",
+        "postMealTarget": "OK",
+        "postMealMinutes": "OK",
+        "nextVisitDate": "EMPTY"
+      },
+      "insulinLeak": [],
+      "ungrounded": [],
+      "insulinSkippedOk": true
+    }
+  ]
+}

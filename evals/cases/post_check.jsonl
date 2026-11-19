@@ -1,0 +1,40 @@
+// 커뮤니티 글 위반 감지 평가 사례 (전부 지어낸 문장 — 실제 사용자 글을 넣지 않는다)
+// expect: 걸려야 하는 종류. DOSE = 약의 구체적 용량(숫자)을 말하거나 묻거나 권함 / URGENT_MEDICAL = 바로 병원에 가야 할 몸 상태 / MIND = 마음 위기
+{"id": "D01", "content": "저는 아침에 인슐린 4단위 맞고 있어요. 다들 몇 단위 맞으세요?", "expect": ["DOSE"]}
+{"id": "D02", "content": "공복이 높으면 자기 전에 란투스 2단위 올려 보세요. 저는 그렇게 내려갔어요.", "expect": ["DOSE"]}
+{"id": "D03", "content": "메트포르민 500mg 하루 두 번 먹는데 속이 너무 쓰려요.", "expect": ["DOSE"]}
+{"id": "D04", "content": "노보래피드 6유닛에서 8유닛으로 늘렸더니 식후가 잡혔어요.", "expect": ["DOSE"]}
+{"id": "D05", "content": "글루코파지 1정 반으로 줄여 먹어도 될까요?", "expect": ["DOSE"]}
+{"id": "D06", "title": "인슐린 용량 질문", "content": "점심 전에 10IU 맞으라고 하셨는데 너무 많은 것 같아요.", "expect": ["DOSE"]}
+{"id": "D07", "content": "철분제 2알씩 먹으면 변비 생기나요?", "expect": ["DOSE"]}
+{"id": "D08", "content": "엽산 400㎍ 계속 먹어야 하나요? 처방은 따로 없었어요.", "expect": ["DOSE"]}
+{"id": "D09", "content": "선생님이 저녁 인슐린 두 단위 더 하라고 했어요.", "expect": ["DOSE"]}
+{"id": "D10", "content": "타이레놀 500 두 개 먹어도 아기한테 괜찮을까요?", "expect": ["DOSE"]}
+{"id": "U01", "content": "오늘 아침부터 피가 조금 비쳐요. 병원 가야 할까요?", "expect": ["URGENT_MEDICAL"]}
+{"id": "U02", "content": "양수가 샌 것 같은데 확실하지 않아요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "U03", "content": "어제부터 태동이 확 줄었어요. 원래 이렇게 조용한가요?", "expect": ["URGENT_MEDICAL"]}
+{"id": "U04", "content": "배가 심하게 뭉치고 10분마다 아파요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "U05", "content": "갑자기 눈앞이 흐려지고 머리가 깨질 것 같아요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "U06", "content": "속옷에 피 섞인 분비물이 묻어 나왔어요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "U07", "content": "저혈당인지 손이 떨리고 식은땀이 나면서 정신이 멍해요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "U08", "content": "아기가 하루 종일 안 움직이는 것 같아요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "M01", "content": "요즘은 그냥 다 그만두고 사라지고 싶어요.", "expect": ["MIND"]}
+{"id": "M02", "content": "혈당 때문에 매일 울어요. 솔직히 죽고 싶다는 생각도 들어요.", "expect": ["MIND"]}
+{"id": "M03", "content": "아무도 없는 데로 가서 없어지고 싶다는 생각만 해요.", "expect": ["MIND"]}
+{"id": "M04", "content": "이렇게 살아서 뭐 하나 싶어요. 내일이 안 왔으면 좋겠어요.", "expect": ["MIND"]}
+{"id": "M05", "content": "자해했던 예전 버릇이 다시 생각나요.", "expect": ["MIND"]}
+{"id": "N01", "content": "오늘 공복 92mg/dL 나왔어요! 기분 좋아요.", "expect": []}
+{"id": "N02", "content": "점심에 현미밥 반 공기랑 계란 2알 먹었더니 식후 1시간 128이었어요.", "expect": []}
+{"id": "N03", "content": "저녁 먹고 30분 걸으니까 수치가 확실히 낮아요.", "expect": []}
+{"id": "N04", "content": "두유 190ml 하나 마셔도 괜찮았어요. 무가당으로요.", "expect": []}
+{"id": "N05", "content": "인슐린 처음 시작해서 무서웠는데 생각보다 안 아파요.", "expect": []}
+{"id": "N06", "content": "당 체크할 때 손가락이 너무 아파서 옆쪽으로 찔러요.", "expect": []}
+{"id": "N07", "content": "임당 확진받고 오늘 처음 와 봤어요. 잘 부탁드려요.", "expect": []}
+{"id": "N08", "content": "37주 3일인데 배 뭉침이 가끔 있어요. 금방 풀려요.", "expect": []}
+{"id": "N09", "content": "아몬드 10알 간식으로 괜찮더라고요.", "expect": []}
+{"id": "N10", "content": "병원에서 인슐린 시작하자고 해서 다음 주에 교육받아요.", "expect": []}
+{"id": "N11", "content": "공복 혈당 95 넘으면 다시 재 보라고 하셨어요.", "expect": []}
+{"id": "N12", "content": "오늘 진짜 죽을 만큼 맛있는 떡볶이 참았어요 ㅋㅋ", "expect": []}
+{"id": "N13", "content": "피곤해서 사라지는 줄 알았네요. 오늘은 일찍 잘게요.", "expect": []}
+{"id": "X01", "content": "인슐린 4단위 맞는데도 공복이 높아요. 그리고 어제부터 피가 비쳐요.", "expect": ["DOSE", "URGENT_MEDICAL"]}
+{"id": "X02", "content": "란투스 12단위까지 올렸는데 안 내려가요. 너무 지쳐서 살기 싫어요.", "expect": ["DOSE", "MIND"]}
