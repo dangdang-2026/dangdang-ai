@@ -36,11 +36,16 @@ def percent(count: int, total: int) -> str:
     return f"{count / total:.1%}" if total else "-"
 
 
-def save(name: str, summary: dict, rows: list[dict]) -> Path:
-    """결과를 evals/results/<이름>-<날짜시각>.json 으로 남긴다 (보고서 숫자의 근거)."""
+def save(
+    name: str, summary: dict, rows: list[dict], model: str | None, prompt_version: str | None
+) -> Path:
+    """결과를 evals/results/<이름>-<날짜시각>.json 으로 남긴다 (보고서 숫자의 근거).
+
+    model: 실제로 부른 모델 (규칙만이면 None). 기능마다 달라서(메모는 mini) 부르는 쪽이 넘긴다.
+    """
     RESULTS.mkdir(exist_ok=True)
-    stamp = datetime.now(KST).strftime("%Y%m%d-%H%M")
+    stamp = datetime.now(KST).strftime("%Y%m%d-%H%M%S")  # 초까지 — 2~3번 연달아 돌려도 안 덮어쓴다
     path = RESULTS / f"{name}-{stamp}.json"
-    body = {"model": settings.llm_model, "summary": summary, "rows": rows}
+    body = {"model": model, "promptVersion": prompt_version, "summary": summary, "rows": rows}
     path.write_text(json.dumps(body, ensure_ascii=False, indent=2), encoding="utf-8")
     return path
