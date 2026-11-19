@@ -28,19 +28,30 @@ DRUG_NAMES = (
     "엽산",
 )
 # 숫자 + 약 단위. mg/dL(혈당 단위)은 뺀다
-STRONG_DOSE = re.compile(r"\d+(?:\.\d+)?\s*(?:단위|유닛|IU|mg(?!\s*/\s*d[lL])|밀리그램|㎎)", re.I)
+STRONG_DOSE = re.compile(
+    r"\d+(?:\.\d+)?\s*(?:단위|유닛|IU|mg(?!\s*/\s*d[lL])|밀리그램|㎎|㎍|mcg|µg|마이크로그램)"
+    r"|(?:한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*(?:단위|유닛)",  # 평가 D08·D09
+    re.I,
+)
 # 숫자 + 알·정·ml — 음식(계란 2알)에도 쓰여서 약 이름이 같이 있을 때만 본다
 WEAK_DOSE = re.compile(r"\d+(?:\.\d+)?\s*(?:알|정|mL|ml|cc)")
+# 약 이름 바로 뒤 숫자 (「타이레놀 500」) — 평가 D10
+DRUG_NUMBER = re.compile("(?:" + "|".join(DRUG_NAMES) + r")\s*\d{2,4}")
 
 URGENT = re.compile(
     r"피가\s*(?:조금\s*|좀\s*)?(?:비쳐|비치|비침|나와|났)|출혈|하혈"
     r"|양수가?\s*(?:터졌|터진|새|샌|흘러)"
-    r"|태동이?\s*(?:줄었|줄어|없어|없|안\s*느껴|약해)"
+    r"|태동이?\s*(?:\S+\s+)?(?:줄었|줄어|없어|없|안\s*느껴|약해)"  # 「태동이 확 줄었어요」 평가 U03
+    r"|(?:아기|애기)가?\s*(?:\S+\s+){0,2}(?:안\s*움직|움직이지\s*않)"  # 평가 U08
+    r"|피\s*(?:섞인|섞여|묻어)"  # 평가 U06
+    r"|식은땀|정신을?\s*잃|의식이?\s*(?:없|흐려|희미)|쓰러[져졌지]"  # 저혈당·실신 평가 U07
     r"|배가\s*심하게\s*(?:아파|아프|뭉쳐|뭉치)|(?:심한|극심한|참을\s*수\s*없는)\s*통증"
     r"|(?:시야가|눈앞이)\s*(?:흐려|흐릿|침침)|경련"
 )
 MIND = re.compile(
     r"죽고\s*싶|사라지고\s*싶|없어지고\s*싶|살기\s*싫|살고\s*싶지\s*않|자해|극단적\s*(?:인\s*)?선택"
+    # 돌려 말하기 — 평가 M04
+    r"|살아서\s*뭐\s*하|살\s*이유가\s*없|내일이\s*안\s*왔으면|눈\s*뜨고\s*싶지\s*않"
 )
 
 SENTENCE_END = re.compile(r"(?<=[.!?。…])\s+|\n+")
@@ -65,7 +76,9 @@ def classify(sentence: str) -> Kind | None:
     if URGENT.search(sentence):
         return "URGENT_MEDICAL"
     has_drug = any(name in sentence for name in DRUG_NAMES)
-    if STRONG_DOSE.search(sentence) or (has_drug and WEAK_DOSE.search(sentence)):
+    if STRONG_DOSE.search(sentence) or (
+        has_drug and (WEAK_DOSE.search(sentence) or DRUG_NUMBER.search(sentence))
+    ):
         return "DOSE"
     return None
 
