@@ -1,0 +1,25 @@
+// 처음 보는 문장 (fresh) — 규칙을 고칠 때 보지 않는다. 점수가 떨어져도 이 파일 문장에 맞춰 규칙을 고치지 않는다 (고치면 다음 fresh를 새로 만든다)
+{"id": "FD01", "content": "레버미어 8단위 자기 전에 맞는 분 계세요?", "expect": ["DOSE"]}
+{"id": "FD02", "content": "다이아벡스 250mg 반 알로 시작했어요.", "expect": ["DOSE"]}
+{"id": "FD03", "content": "휴마로그는 밥 먹기 직전에 다섯 단위면 되던데요.", "expect": ["DOSE"]}
+{"id": "FD04", "content": "아스피린 100 매일 먹으라는데 다들 드시나요?", "expect": ["DOSE"]}
+{"id": "FD05", "content": "트레시바 용량을 14로 올리라고 하셨어요.", "expect": ["DOSE"]}
+{"id": "FD06", "content": "인슐린은 그냥 1~2 정도 더 맞아도 돼요. 제가 해 봤어요.", "expect": ["DOSE"]}
+{"id": "FU01", "content": "방금 화장실 갔는데 출혈이 있어요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "FU02", "content": "물 같은 게 계속 흘러요. 양수일까요?", "expect": ["URGENT_MEDICAL"]}
+{"id": "FU03", "content": "오늘따라 아기가 너무 조용해요. 평소엔 많이 차는데.", "expect": ["URGENT_MEDICAL"]}
+{"id": "FU04", "content": "명치가 찢어질 듯이 아프고 토할 것 같아요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "FU05", "content": "혈당이 40까지 떨어지고 어지러워서 앉아 있어요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "FU06", "content": "얼굴이랑 손이 갑자기 퉁퉁 붓고 시야가 흐릿해요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "FM01", "content": "다 내려놓고 싶어요. 살 이유가 없는 것 같아요.", "expect": ["MIND"]}
+{"id": "FM02", "content": "아기한테 미안하지만 그냥 끝내고 싶어요.", "expect": ["MIND"]}
+{"id": "FM03", "content": "아침에 눈 뜨고 싶지 않아요.", "expect": ["MIND"]}
+{"id": "FM04", "content": "나 같은 엄마는 없는 게 나을 것 같아요.", "expect": ["MIND"]}
+{"id": "FN01", "content": "식후 2시간 118! 처음으로 목표 안에 들어왔어요.", "expect": []}
+{"id": "FN02", "content": "고구마 100g이면 밥 몇 숟가락이랑 비슷할까요?", "expect": []}
+{"id": "FN03", "content": "인슐린 펜 바늘 버리는 곳 아시는 분?", "expect": []}
+{"id": "FN04", "content": "진료 때 물어볼 거 미리 적어 가니까 좋더라고요.", "expect": []}
+{"id": "FN05", "content": "28주 검사에서 140 넘어서 재검했어요.", "expect": []}
+{"id": "FN06", "content": "산책하다가 넘어질 뻔했는데 괜찮아요. 조심해야겠어요.", "expect": []}
+{"id": "FN07", "content": "오늘 혈당은 망했지만 내일 또 해 볼게요!", "expect": []}
+{"id": "FN08", "content": "그릭요거트 1통 먹고 식후 1시간 132였어요.", "expect": []}
