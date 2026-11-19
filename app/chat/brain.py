@@ -45,11 +45,37 @@ class ChatReply(BaseModel):
     records: Records | None = None
     questionDraft: str | None = None
     sources: list[SourceOut] = Field(default_factory=list)
+    reason: str | None = None  # UNKNOWN일 때 이유 (화면에서 버튼을 고를 때 쓸 수 있음)
     promptVersion: str = PROMPT_VERSION
 
 
-def unknown() -> ChatReply:
-    return ChatReply(kind="UNKNOWN")
+# 답할 수 없을 때 보일 글. GPT가 글을 만들지 않고 이유(reason)만 고른다 → 판단·숫자가 섞일 틈이 없다
+UNKNOWN_TEXTS = {
+    "JUDGMENT": (
+        "수치가 괜찮은지, 약을 어떻게 할지는 당당이가 판단할 수 없어요. 진료 때 꼭 물어봐 주세요."
+    ),
+    "NO_SOURCE": "그 내용은 당당이가 가진 자료에 없어요. 다니는 병원에 물어봐 주세요.",
+    "CHITCHAT": "언제든 불러 주세요! 기록 보기나 진료 때 물어볼 말 만들기를 도와드릴게요.",
+    "RUDE": (
+        "도움이 못 돼서 죄송해요. 당당이는 기록 보기와 "
+        "진료 때 물어볼 말 만들기를 도와드릴 수 있어요."
+    ),
+    "OFF_TOPIC": (
+        "그건 당당이가 도와드리기 어려워요. 혈당 기록이나 진료 준비라면 언제든 물어봐 주세요."
+    ),
+    # 기록 동의 없이 기록을 원할 때 (Spring CONSENT_TEXT와 같은 문장). 동의가 있으면 쓰지 않는다
+    "NO_CONSENT": (
+        "내 기록을 보려면 「기록 사용 동의」가 필요해요. 마이 › AI 설정에서 켤 수 있어요."
+    ),
+}
+DRAFT_TEXT = "진료 때 이렇게 물어보면 어떨까요?"
+WORRIED_DRAFT_TEXT = "걱정되셨죠. 진료 때 이렇게 물어보면 어떨까요?"
+
+
+def unknown(reason: str | None = None) -> ChatReply:
+    """이유를 모르거나 이상하면 NO_SOURCE (도구 안 부름·깨진 인자·출처 없음·용량 숫자 등)."""
+    reason = reason if reason in UNKNOWN_TEXTS else "NO_SOURCE"
+    return ChatReply(kind="UNKNOWN", text=UNKNOWN_TEXTS[reason], reason=reason)
 
 
 def _parse_date(value) -> date | None:
@@ -93,7 +119,9 @@ class OpenAIChatBrain:
         return self._to_reply(name, args, records_allowed, sources)
 
     def _to_reply(self, name: str, args: dict, records_allowed: bool, sources) -> ChatReply:
-        if name == "show_records" and records_allowed:
+        if name == "show_records" and not records_allowed:
+            return unknown("NO_CONSENT")
+        if name == "show_records":
             slot = args.get("slot")
             return ChatReply(
                 kind="RECORDS",
@@ -107,9 +135,8 @@ class OpenAIChatBrain:
             draft = str(args.get("question") or "").strip()[:MAX_DRAFT]
             if not draft:
                 return unknown()
-            return ChatReply(
-                kind="QUESTION_DRAFT", text="진료 때 이렇게 물어보면 어떨까요?", questionDraft=draft
-            )
+            intro = WORRIED_DRAFT_TEXT if args.get("worried") is True else DRAFT_TEXT
+            return ChatReply(kind="QUESTION_DRAFT", text=intro, questionDraft=draft)
         if name == "answer_from_sources":
             answer = str(args.get("answer") or "").strip()[:MAX_ANSWER]
             by_id = {s.id: s for s in sources}
@@ -121,4 +148,9 @@ class OpenAIChatBrain:
                 text=answer,
                 sources=[SourceOut(title=s.title, url=s.url) for s in picked],
             )
+        if name == "say_unknown":
+            reason = args.get("reason")
+            if reason == "NO_CONSENT" and records_allowed:
+                reason = None  # 동의했는데 「동의가 필요해요」라고 하면 틀린 안내
+            return unknown(reason)
         return unknown()
