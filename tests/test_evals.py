@@ -36,6 +36,20 @@ def test_맞춘_사례는_규칙만으로_모두_맞는다(case):
     assert got == sorted(case["expect"])
 
 
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "측정한 단위가 달라요",
+        "인슐린 30분 전에 맞아요",
+        "엽산 2026년부터 먹었어요",
+        "남 의식이 없어서 편해요",
+    ],
+)
+def test_규칙을_넓혀도_엉뚱한_문장은_안_걸린다(sentence):
+    # 11/19 리뷰에서 찾은 오탐 — 한글 숫자·약 이름 뒤 숫자·의식 규칙이 다시 넓어지면 여기서 걸린다
+    assert find_hits("", sentence) == []
+
+
 def test_글_감지_평가는_놓침과_잘못_건_것을_센다(client):
     app.dependency_overrides[get_dose_checker] = lambda: None
     cases = [
