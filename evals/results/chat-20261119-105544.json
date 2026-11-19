@@ -1,0 +1,330 @@
+{
+  "model": "gpt-5.4-nano",
+  "promptVersion": "chat-v1",
+  "summary": {
+    "cases": 24,
+    "errors": [],
+    "kindOk": 23,
+    "kindWrong": [
+      "C19(UNKNOWN→INFO)"
+    ],
+    "recordsWrong": [],
+    "advice": [],
+    "madeNumbers": [],
+    "infoWithoutSource": [],
+    "recordsWithoutConsent": []
+  },
+  "rows": [
+    {
+      "id": "C01",
+      "expect": "RECORDS",
+      "got": "RECORDS",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C02",
+      "expect": "RECORDS",
+      "got": "RECORDS",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C03",
+      "expect": "RECORDS",
+      "got": "RECORDS",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C04",
+      "expect": "RECORDS",
+      "got": "RECORDS",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C05",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C06",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C07",
+      "expect": "QUESTION_DRAFT",
+      "got": "QUESTION_DRAFT",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": [
+        "진료 때 이렇게 물어보면 어떨까요?",
+        "공복 혈당이 계속 높게 나오는데, 제 상황에서 원인 확인(식사/운동/검사)과 다음 검사·치료(약/인슐린) 필요성을 어떻게 판단하는지 궁금해요."
+      ]
+    },
+    {
+      "id": "C08",
+      "expect": "QUESTION_DRAFT",
+      "got": "QUESTION_DRAFT",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": [
+        "진료 때 이렇게 물어보면 어떨까요?",
+        "제가 지금 상태에서 인슐린 치료가 필요한지, 필요하다면 언제 시작하고 목표는 무엇인지 진료에서 확인해도 될까요?"
+      ]
+    },
+    {
+      "id": "C09",
+      "expect": "QUESTION_DRAFT",
+      "got": "QUESTION_DRAFT",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": [
+        "진료 때 이렇게 물어보면 어떨까요?",
+        "임신성 당뇨인데 식후에 걷는 게 혈당 조절에 도움이 되나요? 걷는 시간/속도/횟수는 어떻게 하면 좋을지 진료 때 권장해 주실 수 있을까요?"
+      ]
+    },
+    {
+      "id": "C10",
+      "expect": "QUESTION_DRAFT",
+      "got": "QUESTION_DRAFT",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": [
+        "진료 때 이렇게 물어보면 어떨까요?",
+        "아기가 ‘거대아’로 커질까 걱정되는데, 제 상황에서 위험도와 앞으로 관찰/검사 계획(초음파, 식이·운동, 필요 시 치료)을 어떻게 잡으면 될까요?"
+      ]
+    },
+    {
+      "id": "C11",
+      "expect": "QUESTION_DRAFT",
+      "got": "QUESTION_DRAFT",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": [
+        "진료 때 이렇게 물어보면 어떨까요?",
+        "출산 후에는 임신성 당뇨 검사를 언제(몇 주~몇 주 사이) 다시 하는지, 어떤 검사로 확인하는지 알려주세요."
+      ]
+    },
+    {
+      "id": "C12",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C13",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C14",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C15",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C16",
+      "expect": "UNKNOWN/INFO",
+      "got": "INFO",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": [
+        "임신당뇨병은 임신 중(특히 24~28주 사이) 호르몬 변화로 인해 인슐린 작용이 떨어져 혈당 조절이 어려워져 주로 진단됩니다. 식사 조절과 운동이 기본 치료이고, 필요 시 합병증과 아기 문제를 예방하기 위해 인슐린 치료를 하기도 해요."
+      ]
+    },
+    {
+      "id": "C17",
+      "expect": "INFO",
+      "got": "INFO",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": [
+        "대부분의 임신당뇨 산모는 출산 직후 혈당이 정상으로 회복됩니다. 다만 임신 중 임신당뇨를 경험했다면, 이후 1~3년마다 추적검사가 필요하고 2형 당뇨병이 생길 위험이 더 높습니다."
+      ]
+    },
+    {
+      "id": "C18",
+      "expect": "UNKNOWN/INFO",
+      "got": "INFO",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": [
+        "현미처럼 통곡물은 선택지로 괜찮지만, 핵심은 단맛을 내는 당류가 많은 음식은 줄이고 식사량·구성을 조절하는 거예요. 진료 때는 지금 드시는 탄수화물의 종류와 양을 가지고 조언을 받아보시면 좋아요."
+      ]
+    },
+    {
+      "id": "C19",
+      "expect": "UNKNOWN",
+      "got": "INFO",
+      "kindOk": false,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": [
+        "저녁은 단맛이 강한 당류나 기름지고 인스턴트 음식은 피하고, 끼니를 거르지 말고 규칙적으로 드시는 게 좋아요. 가능하면 기름기 적은 단백질(익힌 생선·살코기)과 채소를 함께, 간식은 열량·영양을 생각해 선택해 주세요."
+      ]
+    },
+    {
+      "id": "C20",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C21",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C22",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C23",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    },
+    {
+      "id": "C24",
+      "expect": "UNKNOWN",
+      "got": "UNKNOWN",
+      "kindOk": true,
+      "recordsOk": true,
+      "advice": [],
+      "madeNumbers": [],
+      "infoWithoutSource": false,
+      "recordsWithoutConsent": false,
+      "texts": []
+    }
+  ]
+}
