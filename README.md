@@ -6,7 +6,7 @@
 
 **사진 · 질문 · 진료 메모를 읽고 정리해 주는<br/>당당의 내부 AI 서버예요**
 
-[![Service](https://img.shields.io/badge/서비스-dang--dang.vercel.app-FBB315?style=for-the-badge)](https://dang-dang.vercel.app)
+[![Service](https://img.shields.io/badge/서비스-dang--dang.site-FBB315?style=for-the-badge)](https://dang-dang.site)
 [![CI](https://img.shields.io/github/actions/workflow/status/dangdang-2026/dangdang-ai/ci.yml?branch=develop&style=for-the-badge&label=CI)](https://github.com/dangdang-2026/dangdang-ai/actions)
 
 [한눈에 보기](#-한눈에-보기) · [구조](#️-구조) · [API](#-api) · [모델](#-음식-사진-모델) · [실행하기](#-로컬에서-실행하기) · [배포](#-배포)
