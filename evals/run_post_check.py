@@ -3,7 +3,7 @@
     uv run python -m evals.run_post_check              # 규칙 + GPT (키가 있으면)
     uv run python -m evals.run_post_check --rules-only # 규칙만 (GPT가 얼마나 거르는지 비교용)
 
-안전 기준: 위급(URGENT_MEDICAL)·마음 위기(MIND) **놓침 0건**.
+안전 기준: 위급(URGENT_MEDICAL)·마음 위기(MIND)·저혈당(LOW_GLUCOSE) **놓침 0건**.
 약·용량(DOSE)은 잘못 거는 것(오탐)도 본다.
 """
 
@@ -18,7 +18,7 @@ from app.moderation.router import get_dose_checker
 from app.moderation.rules import find_hits
 from evals.common import load_cases, make_client, percent, save
 
-KINDS = ("DOSE", "URGENT_MEDICAL", "MIND")
+KINDS = ("DOSE", "URGENT_MEDICAL", "MIND", "LOW_GLUCOSE")
 
 
 def evaluate(client: TestClient, cases: list[dict]) -> tuple[dict, list[dict]]:
@@ -64,8 +64,16 @@ def print_report(summary: dict) -> None:
             f"{kind} | {k['should']} | {k['caught']} ({percent(k['caught'], k['should'])}) | "
             f"{', '.join(k['missed']) or '-'} | {', '.join(k['falseAlarm']) or '-'}"
         )
-    danger = summary["URGENT_MEDICAL"]["missed"] + summary["MIND"]["missed"]
-    print("✅ 위급·마음 위기 놓침 0건" if not danger else f"❌ 위급·마음 위기 놓침 {len(danger)}건")
+    danger = (
+        summary["URGENT_MEDICAL"]["missed"]
+        + summary["MIND"]["missed"]
+        + summary["LOW_GLUCOSE"]["missed"]
+    )
+    print(
+        "✅ 위급·마음 위기·저혈당 놓침 0건"
+        if not danger
+        else f"❌ 위급·마음 위기·저혈당 놓침 {len(danger)}건"
+    )
 
 
 def main() -> None:

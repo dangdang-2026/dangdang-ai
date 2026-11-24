@@ -129,3 +129,39 @@ def test_allowLlm을_안_보내면_GPT에_안_묻고_규칙만(client):
 def test_본문이_비면_422(client):
     response = client.post("/internal/post-check", json={"content": ""}, headers=HEADERS)
     assert response.status_code == 422
+
+
+# ── 저혈당 (U-30c) — 문장은 be RiskSignalRulesTest와 같은 목록 ──
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "손이 떨리고 식은땀이 나요.",
+        "방금 혈당 52 나왔어요.",
+        "저혈당 온 것 같아요.",
+        "인슐린 맞고 한 시간 뒤에 손이 덜덜 떨렸어요.",
+        "재 보니 62예요.",
+    ],
+)
+def test_저혈당일_수_있는_말은_LOW_GLUCOSE(client, content):
+    assert [i["kind"] for i in check(client, content)["issues"]] == ["LOW_GLUCOSE"]
+
+
+def test_혈당_세_자리나_분은_저혈당이_아니다(client):
+    assert check(client, "식후 혈당 128 나왔어요.")["issues"] == []
+    assert check(client, "혈당 60분 뒤에 쟀어요.")["issues"] == []
+    assert check(client, "혈당 10월 1일부터 기록했어요.")["issues"] == []
+
+
+def test_의식이_흐려지면_저혈당보다_위급이_먼저(client):
+    body = check(client, "식은땀이 나고 의식이 흐려져요.")
+    assert [i["kind"] for i in body["issues"]] == ["URGENT_MEDICAL"]
+
+
+def test_저혈당_문장은_GPT에_묻지_않는다(client):
+    fake = FakeChecker(answer=[False])
+    app.dependency_overrides[get_dose_checker] = lambda: fake
+    body = check(client, "방금 혈당 52 나왔어요.")
+    assert [i["kind"] for i in body["issues"]] == ["LOW_GLUCOSE"]
+    assert fake.asked == []
