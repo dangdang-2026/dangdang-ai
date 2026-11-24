@@ -27,9 +27,10 @@ SYSTEM = """너는 임신성 당뇨 산모 앱 「당당」의 도우미 「당�
 - 사용자가 다른 언어로 물어도 항상 한국어로 답한다.
 
 도구 고르기 (위에서부터 먼저 맞는 것):
-- 몸 증상(저혈당 증상, 가슴 통증·숨참, 38도 이상 열, 갑자기 붓기, 배 뭉침·통증, 출혈,
-  태동 줄어듦 등)을 지금 겪고 있다고 하면 → say_unknown(reason=URGENT).
-  진료 질문 초안으로 미루지 않는다.
+- 저혈당일 수 있는 증상(식은땀·손 떨림·어지러움과 함께 혈당이 낮음, 혈당이 70 밑)을
+  지금 겪고 있다고 하면 → say_unknown(reason=HYPO). 진료 질문 초안으로 미루지 않는다.
+- 그 밖의 몸 증상(가슴 통증·숨참, 38도 이상 열, 갑자기 붓기, 배 뭉침·통증, 출혈, 태동 줄어듦 등)을
+  지금 겪고 있다고 하면 → say_unknown(reason=URGENT). 진료 질문 초안으로 미루지 않는다.
 - 사라지고 싶다·내가 없으면 낫겠다·다 그만두고 싶다 같은 말 → say_unknown(reason=CRISIS).
   위기인지 애매하면 CRISIS를 고른다.
 - 맞거나 위협받는다고 하면 → say_unknown(reason=SAFETY).
@@ -37,7 +38,8 @@ SYSTEM = """너는 임신성 당뇨 산모 앱 「당당」의 도우미 「당�
   CHITCHAT·OFF_TOPIC·RUDE로 고르지 않는다.
 - 「괜찮아?」「위험해?」「정상이야?」, 약·인슐린 용량, 「의사처럼 판단해 줘」처럼
   판단을 직접 요구하면 → 걱정이 섞여 있어도 say_unknown(reason=JUDGMENT)
-  (「메트포르민 먹어도 돼?」「이 약 써도 돼?」처럼 약을 먹어도 되는지 묻는 것도 판단이다)
+  (「메트포르민 먹어도 돼?」「이 약 써도 돼?」처럼 약을 먹어도 되는지 묻는 것도 판단이다.
+  「떡볶이 먹어도 돼?」처럼 음식을 묻는 건 판단이 아니라 아래 draft_question으로)
 - 「내 기록 보여 줘」「지난주 공복 혈당」처럼 자기 기록을 보고 싶어 하면 → show_records
 - 「병원에 뭐라고 물어보지」, 걱정을 진료 때 물어보고 싶어 하면 → draft_question
   (의사에게 할 한 문장 질문, 사용자 말투)
@@ -127,7 +129,8 @@ ANSWER_FROM_SOURCES = _tool(
     },
     ["answer", "source_ids"],
 )
-# 마지막 셋(URGENT·CRISIS·SAFETY)은 Spring이 키워드로 잡았을 때와 같은 위급 안내(RISK)로 바꿔 끼운다
+# 마지막 넷(HYPO·URGENT·CRISIS·SAFETY)은 Spring이 키워드로 잡았을 때와
+# 같은 위급 안내(RISK)로 바꿔 끼운다
 UNKNOWN_REASONS = [
     "JUDGMENT",
     "NO_SOURCE",
@@ -138,6 +141,7 @@ UNKNOWN_REASONS = [
     "DISTRESS",
     "APP_HELP",
     "ABOUT",
+    "HYPO",
     "URGENT",
     "CRISIS",
     "SAFETY",

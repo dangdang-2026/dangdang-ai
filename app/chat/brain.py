@@ -50,7 +50,7 @@ class ChatReply(BaseModel):
 
 
 # 답할 수 없을 때 보일 글. GPT가 글을 만들지 않고 이유(reason)만 고른다 → 판단·숫자가 섞일 틈이 없다
-# URGENT·CRISIS·SAFETY는 Spring이 키워드 안내와 같은 위급 안내로 바꿔 끼운다
+# HYPO·URGENT·CRISIS·SAFETY는 Spring이 키워드 안내와 같은 위급 안내로 바꿔 끼운다
 # → 여기 글은 예전 Spring용 예비
 UNKNOWN_TEXTS = {
     "JUDGMENT": ("그건 사람마다 달라서 당당이가 정해 드릴 수 없어요. 진료 때 꼭 물어봐 주세요."),
@@ -80,6 +80,10 @@ UNKNOWN_TEXTS = {
         "몸 상태 판단은 나를 보는 의료진이 가장 정확해서 병원에 물어보시라고 해요."
     ),
     # ↓ 예비 (Spring RiskSignalRules 문장과 뜻을 맞춤)
+    "HYPO": (
+        "병원에서 안내받은 저혈당 대처를 먼저 해 주세요. "
+        "어지럽거나 의식이 흐려지면 바로 119에 전화해 주세요."
+    ),
     "URGENT": (
         "지금은 병원에 먼저 연락해 주세요. "
         "피가 많이 나거나, 어지럽거나, 의식이 흐려지면 바로 119에 전화해 주세요."

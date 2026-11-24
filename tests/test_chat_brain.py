@@ -196,6 +196,7 @@ def test_이유마다_정해진_문장(no_sources, reason, phrase):
         ("DISTRESS", "1577-0199"),
         ("APP_HELP", "마이 › 도움말"),
         ("ABOUT", "의료진"),
+        ("HYPO", "저혈당"),
         ("URGENT", "119"),
         ("CRISIS", "109"),
         ("SAFETY", "112"),
@@ -208,11 +209,11 @@ def test_새_이유도_정해진_문장(no_sources, reason, phrase):
     assert phrase in reply.text
 
 
-def test_say_unknown_이유는_12개(no_sources):
+def test_say_unknown_이유는_13개(no_sources):
     fake = FakeOpenAI("say_unknown", {"reason": "CHITCHAT"})
     decide(fake)
     tool = next(t for t in fake.calls[0]["tools"] if t["function"]["name"] == "say_unknown")
-    assert len(tool["function"]["parameters"]["properties"]["reason"]["enum"]) == 12
+    assert len(tool["function"]["parameters"]["properties"]["reason"]["enum"]) == 13
 
 
 def test_모르는_이유나_이유_없음은_자료에_없음으로(no_sources):
