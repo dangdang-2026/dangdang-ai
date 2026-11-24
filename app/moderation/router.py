@@ -21,6 +21,7 @@ class DoseChecker(Protocol):
 class PostCheckRequest(BaseModel):
     title: str = Field(default="", max_length=100)
     content: str = Field(min_length=1, max_length=5000)
+    allowLlm: bool = True  # Spring이 커뮤니티 AI 확인 동의(COMMUNITY_AI_CHECK)를 보고 정한다. False면 규칙만 (해외로 안 보냄)
 
 
 class Issue(BaseModel):
@@ -49,7 +50,7 @@ def post_check(
     dose_hits = [h for h in hits if h.kind == "DOSE"]
 
     llm_checked = False
-    if dose_hits and checker is not None:
+    if dose_hits and checker is not None and request.allowLlm:
         confirmed = checker.confirm_dose([h.quote for h in dose_hits])
         if confirmed is not None:  # 물어봤으면 아니라고 한 문장은 뺀다
             llm_checked = True

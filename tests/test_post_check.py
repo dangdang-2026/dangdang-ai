@@ -97,6 +97,17 @@ def test_위급_문장은_GPT에_묻지_않는다(client):
     assert fake.asked == []
 
 
+def test_동의가_없으면_GPT에_안_묻고_규칙만(client):
+    fake = FakeChecker([False])
+    app.dependency_overrides[get_dose_checker] = lambda: fake
+    response = client.post("/internal/post-check",
+                           json={"content": "인슐린 4단위 맞아요.", "allowLlm": False}, headers=HEADERS)
+    body = response.json()
+    assert fake.asked == []
+    assert body["llmChecked"] is False
+    assert [i["kind"] for i in body["issues"]] == ["DOSE"]
+
+
 def test_본문이_비면_422(client):
     response = client.post("/internal/post-check", json={"content": ""}, headers=HEADERS)
     assert response.status_code == 422
