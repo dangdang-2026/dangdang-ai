@@ -165,3 +165,58 @@ def test_저혈당_문장은_GPT에_묻지_않는다(client):
     body = check(client, "방금 혈당 52 나왔어요.")
     assert [i["kind"] for i in body["issues"]] == ["LOW_GLUCOSE"]
     assert fake.asked == []
+
+
+# ── 11/25 리뷰에서 찾은 말 — be RiskSignalRulesTest와 같은 문장, 같은 결과 ──
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["피가 너무 많이 나요.", "피 나요.", "갈색 피비침이 있어요."],
+)
+def test_출혈은_부사가_둘이어도_피비침도_위급(client, content):
+    assert [i["kind"] for i in check(client, content)["issues"]] == ["URGENT_MEDICAL"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["혈당이 너무 낮아요 어지러워요.", "혈당이 떨어져서 어지러워요.", "혈당 65mg/dL 나왔어요."],
+)
+def test_혈당이_낮다_떨어졌다도_저혈당(client, content):
+    assert [i["kind"] for i in check(client, content)["issues"]] == ["LOW_GLUCOSE"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "혈당 측정기 15만원이에요.",
+        "혈당 측정 30초면 끝나요.",
+        "혈당 관리하는 50대예요.",
+        "혈당 낮추는 법 알려 주세요.",
+        "혈당 떨어뜨리는 음식 있나요?",
+        "커피 나와요.",
+        "피가 나아졌어요.",
+        "회사 다 그만두고 싶어요.",
+    ],
+)
+def test_돈_시간_나이와_흔한_말은_안_걸린다(client, content):
+    assert check(client, content)["issues"] == []
+
+
+def test_혈당_뒤_약_용량은_저혈당이_아니라_약_용량(client):
+    body = check(client, "혈당 쟀는데 인슐린 12단위 맞아야 해?")
+    assert [i["kind"] for i in body["issues"]] == ["DOSE"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["란투스 10단위 맞았는데 혈당 65 나왔어요.", "인슐린 4단위 맞고 손이 떨려요."],
+)
+def test_저혈당과_약_용량이_한_문장에_있으면_둘_다(client, content):
+    kinds = [i["kind"] for i in check(client, content)["issues"]]
+    assert kinds == ["LOW_GLUCOSE", "DOSE"]
+
+
+def test_마음_위기는_내가_없으면만(client):
+    assert [i["kind"] for i in check(client, "내가 없으면 다들 편할 텐데")["issues"]] == ["MIND"]
+    assert check(client, "엄마 없으면 편해요.")["issues"] == []

@@ -41,3 +41,6 @@
 {"id": "G01", "content": "방금 혈당 52 나왔어요. 사탕 먹고 기다리는 중이에요.", "expect": ["LOW_GLUCOSE"]}
 {"id": "G02", "content": "인슐린 맞고 한 시간 뒤에 손이 덜덜 떨렸어요.", "expect": ["LOW_GLUCOSE"]}
 {"id": "G03", "content": "식후 혈당 60분에 쟀는데 128이었어요.", "expect": []}
+{"id": "G04", "content": "인슐린 4단위 맞고 손이 떨려요.", "expect": ["DOSE", "LOW_GLUCOSE"]}
+{"id": "G05", "content": "란투스 10단위 맞았는데 혈당 65 나왔어요.", "expect": ["DOSE", "LOW_GLUCOSE"]}
+{"id": "G06", "content": "혈당 측정기 15만원 주고 샀어요. 30초면 결과 나와요.", "expect": []}
