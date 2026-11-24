@@ -30,8 +30,11 @@ def client(monkeypatch):
 
 
 def check(client, content, title=""):
+    # 동의한 사람의 요청 (GPT 확인까지 보는 테스트들). 동의 없는 경우는 아래에서 따로
     response = client.post(
-        "/internal/post-check", json={"title": title, "content": content}, headers=HEADERS
+        "/internal/post-check",
+        json={"title": title, "content": content, "allowLlm": True},
+        headers=HEADERS,
     )
     assert response.status_code == 200
     return response.json()
@@ -100,8 +103,23 @@ def test_위급_문장은_GPT에_묻지_않는다(client):
 def test_동의가_없으면_GPT에_안_묻고_규칙만(client):
     fake = FakeChecker([False])
     app.dependency_overrides[get_dose_checker] = lambda: fake
-    response = client.post("/internal/post-check",
-                           json={"content": "인슐린 4단위 맞아요.", "allowLlm": False}, headers=HEADERS)
+    response = client.post(
+        "/internal/post-check",
+        json={"content": "인슐린 4단위 맞아요.", "allowLlm": False},
+        headers=HEADERS,
+    )
+    body = response.json()
+    assert fake.asked == []
+    assert body["llmChecked"] is False
+    assert [i["kind"] for i in body["issues"]] == ["DOSE"]
+
+
+def test_allowLlm을_안_보내면_GPT에_안_묻고_규칙만(client):
+    fake = FakeChecker([False])
+    app.dependency_overrides[get_dose_checker] = lambda: fake
+    response = client.post(
+        "/internal/post-check", json={"content": "인슐린 4단위 맞아요."}, headers=HEADERS
+    )
     body = response.json()
     assert fake.asked == []
     assert body["llmChecked"] is False

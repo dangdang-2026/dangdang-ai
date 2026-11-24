@@ -21,7 +21,10 @@ class DoseChecker(Protocol):
 class PostCheckRequest(BaseModel):
     title: str = Field(default="", max_length=100)
     content: str = Field(min_length=1, max_length=5000)
-    allowLlm: bool = True  # Spring이 커뮤니티 AI 확인 동의(COMMUNITY_AI_CHECK)를 보고 정한다. False면 규칙만 (해외로 안 보냄)
+    # Spring이 커뮤니티 AI 확인 동의(COMMUNITY_AI_CHECK)를 보고 정한다
+    # False면 규칙만 (해외로 안 보냄)
+    # 안 보내면 False — 동의를 모르는 요청(옛 Spring 등)은 GPT로 보내지 않는다
+    allowLlm: bool = False
 
 
 class Issue(BaseModel):
