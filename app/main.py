@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 from app.chat.router import router as chat_router
 from app.core.config import settings
+from app.embedding.router import router as embedding_router
 from app.food.predictor import FoodPredictor
 from app.food.router import router as food_router
 from app.moderation.router import router as moderation_router
@@ -31,6 +32,7 @@ app.include_router(food_router)
 app.include_router(moderation_router)
 app.include_router(chat_router)
 app.include_router(visit_note_router)
+app.include_router(embedding_router)
 
 
 @app.get("/health")

@@ -58,6 +58,7 @@ flowchart LR
 | `POST /internal/chat` | 질문 → 무엇을 보여 줄지<br/>`RECORDS` · `QUESTION_DRAFT` · `INFO` · `UNKNOWN` |
 | `POST /internal/visit-note/organize` | 진료 메모 + 진료한 날 → 칸별 정리 · 근거 문장 |
 | `POST /internal/post-check` | 글 제목 · 내용 → 걸리는 문장<br/>`DOSE` · `URGENT_MEDICAL` · `MIND` · `SAFETY` · `LOW_GLUCOSE` |
+| `POST /internal/embeddings` | 음식 이름 1~100개 → 1536차원 벡터 (보낸 순서 그대로)<br/>Spring이 음식 DB에서 비슷한 이름을 찾을 때 써요 |
 
 `/internal/*`는 모두 `X-Internal-Token` 헤더가 맞아야 해요 (없거나 틀리면 401).
 
@@ -114,6 +115,7 @@ flowchart LR
 | 챗봇 | `LLM_MODEL` (기본 `gpt-5.4-nano`) | 일반 정보는 원문을 확인한 승인 자료만 (`sources.py`)<br/>맞는 자료가 없으면 「병원에 물어보세요」 |
 | 진료 메모 정리 | `LLM_MODEL_NOTE` (기본 `gpt-5.4-mini`) | 근거 문장이 메모에 정말 있는지 다시 확인 (`verify.py`) |
 | 글 확인 | 규칙 + `LLM_MODEL` | 규칙으로 먼저 찾고, 약 · 용량 문장만 GPT로 한 번 더 |
+| 음식 이름 임베딩 | `EMBEDDING_MODEL` (기본 `text-embedding-3-small`)<br/>1536차원은 DB 칸과 맞춰 코드에 고정 | 음식 이름만 받아요. 여러 개를 한 번에 보내고 로그엔 개수만 남겨요 |
 
 평가 문장과 채점 스크립트는 [`evals/`](evals/README.md)에 있어요.
 
@@ -150,7 +152,8 @@ app/
 ├── food/                # /internal/food-candidates — router · preprocess · predictor
 ├── chat/                # /internal/chat — router · brain · prompt · sources(승인 자료)
 ├── visit_note/          # /internal/visit-note/organize — router · organize · verify
-└── moderation/          # /internal/post-check — router · rules · dose_check
+├── moderation/          # /internal/post-check — router · rules · dose_check
+└── embedding/           # /internal/embeddings — router · embedder
 training/                # 모델 학습 · ONNX 변환 · 내 사진 시험 (서버와 따로)
 evals/                   # 기능별 평가 문장 · 채점 · 결과
 tests/                   # pytest
