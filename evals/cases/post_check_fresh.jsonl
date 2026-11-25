@@ -9,7 +9,7 @@
 {"id": "FU02", "content": "물 같은 게 계속 흘러요. 양수일까요?", "expect": ["URGENT_MEDICAL"]}
 {"id": "FU03", "content": "오늘따라 아기가 너무 조용해요. 평소엔 많이 차는데.", "expect": ["URGENT_MEDICAL"]}
 {"id": "FU04", "content": "명치가 찢어질 듯이 아프고 토할 것 같아요.", "expect": ["URGENT_MEDICAL"]}
-{"id": "FU05", "content": "혈당이 40까지 떨어지고 어지러워서 앉아 있어요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "FU05", "content": "혈당이 40까지 떨어지고 어지러워서 앉아 있어요.", "expect": ["LOW_GLUCOSE"]}
 {"id": "FU06", "content": "얼굴이랑 손이 갑자기 퉁퉁 붓고 시야가 흐릿해요.", "expect": ["URGENT_MEDICAL"]}
 {"id": "FM01", "content": "다 내려놓고 싶어요. 살 이유가 없는 것 같아요.", "expect": ["MIND"]}
 {"id": "FM02", "content": "아기한테 미안하지만 그냥 끝내고 싶어요.", "expect": ["MIND"]}

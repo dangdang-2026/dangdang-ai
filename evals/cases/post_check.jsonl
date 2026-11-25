@@ -1,5 +1,5 @@
 // 커뮤니티 글 위반 감지 평가 사례 (전부 지어낸 문장 — 실제 사용자 글을 넣지 않는다)
-// expect: 걸려야 하는 종류. DOSE = 약의 구체적 용량(숫자)을 말하거나 묻거나 권함 / URGENT_MEDICAL = 바로 병원에 가야 할 몸 상태 / MIND = 마음 위기
+// expect: 걸려야 하는 종류. DOSE = 약의 구체적 용량(숫자)을 말하거나 묻거나 권함 / URGENT_MEDICAL = 바로 병원에 가야 할 몸 상태 / MIND = 마음 위기 / SAFETY = 폭력·위협 / LOW_GLUCOSE = 저혈당일 수 있는 말
 {"id": "D01", "content": "저는 아침에 인슐린 4단위 맞고 있어요. 다들 몇 단위 맞으세요?", "expect": ["DOSE"]}
 {"id": "D02", "content": "공복이 높으면 자기 전에 란투스 2단위 올려 보세요. 저는 그렇게 내려갔어요.", "expect": ["DOSE"]}
 {"id": "D03", "content": "메트포르민 500mg 하루 두 번 먹는데 속이 너무 쓰려요.", "expect": ["DOSE"]}
@@ -16,7 +16,7 @@
 {"id": "U04", "content": "배가 심하게 뭉치고 10분마다 아파요.", "expect": ["URGENT_MEDICAL"]}
 {"id": "U05", "content": "갑자기 눈앞이 흐려지고 머리가 깨질 것 같아요.", "expect": ["URGENT_MEDICAL"]}
 {"id": "U06", "content": "속옷에 피 섞인 분비물이 묻어 나왔어요.", "expect": ["URGENT_MEDICAL"]}
-{"id": "U07", "content": "저혈당인지 손이 떨리고 식은땀이 나면서 정신이 멍해요.", "expect": ["URGENT_MEDICAL"]}
+{"id": "U07", "content": "저혈당인지 손이 떨리고 식은땀이 나면서 정신이 멍해요.", "expect": ["LOW_GLUCOSE"]}
 {"id": "U08", "content": "아기가 하루 종일 안 움직이는 것 같아요.", "expect": ["URGENT_MEDICAL"]}
 {"id": "M01", "content": "요즘은 그냥 다 그만두고 사라지고 싶어요.", "expect": ["MIND"]}
 {"id": "M02", "content": "혈당 때문에 매일 울어요. 솔직히 죽고 싶다는 생각도 들어요.", "expect": ["MIND"]}
@@ -38,3 +38,13 @@
 {"id": "N13", "content": "피곤해서 사라지는 줄 알았네요. 오늘은 일찍 잘게요.", "expect": []}
 {"id": "X01", "content": "인슐린 4단위 맞는데도 공복이 높아요. 그리고 어제부터 피가 비쳐요.", "expect": ["DOSE", "URGENT_MEDICAL"]}
 {"id": "X02", "content": "란투스 12단위까지 올렸는데 안 내려가요. 너무 지쳐서 살기 싫어요.", "expect": ["DOSE", "MIND"]}
+{"id": "G01", "content": "방금 혈당 52 나왔어요. 사탕 먹고 기다리는 중이에요.", "expect": ["LOW_GLUCOSE"]}
+{"id": "G02", "content": "인슐린 맞고 한 시간 뒤에 손이 덜덜 떨렸어요.", "expect": ["LOW_GLUCOSE"]}
+{"id": "G03", "content": "식후 혈당 60분에 쟀는데 128이었어요.", "expect": []}
+{"id": "G04", "content": "인슐린 4단위 맞고 손이 떨려요.", "expect": ["DOSE", "LOW_GLUCOSE"]}
+{"id": "G05", "content": "란투스 10단위 맞았는데 혈당 65 나왔어요.", "expect": ["DOSE", "LOW_GLUCOSE"]}
+{"id": "G06", "content": "혈당 측정기 15만원 주고 샀어요. 30초면 결과 나와요.", "expect": []}
+{"id": "V01", "content": "남편이 때려요. 어디에 말해야 할지 모르겠어요.", "expect": ["SAFETY"]}
+{"id": "V02", "content": "어제 남편한테 또 맞았어요.", "expect": ["SAFETY"]}
+{"id": "V03", "content": "아기가 배를 발로 때리는 느낌이 들어요. 태동 맞죠?", "expect": []}
+{"id": "V04", "content": "인슐린 맞았는데 주사 자리가 멍들었어요.", "expect": []}

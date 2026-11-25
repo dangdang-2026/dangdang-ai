@@ -57,7 +57,7 @@ flowchart LR
 | `POST /internal/food-candidates` | 사진 1장 (10MB까지) → 음식 후보 3개 · 확신도 |
 | `POST /internal/chat` | 질문 → 무엇을 보여 줄지<br/>`RECORDS` · `QUESTION_DRAFT` · `INFO` · `UNKNOWN` |
 | `POST /internal/visit-note/organize` | 진료 메모 + 진료한 날 → 칸별 정리 · 근거 문장 |
-| `POST /internal/post-check` | 글 제목 · 내용 → 걸리는 문장<br/>`DOSE` · `URGENT_MEDICAL` · `MIND` |
+| `POST /internal/post-check` | 글 제목 · 내용 → 걸리는 문장<br/>`DOSE` · `URGENT_MEDICAL` · `MIND` · `SAFETY` · `LOW_GLUCOSE` |
 
 `/internal/*`는 모두 `X-Internal-Token` 헤더가 맞아야 해요 (없거나 틀리면 401).
 
