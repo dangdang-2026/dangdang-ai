@@ -1,14 +1,14 @@
-"""1단계: 규칙으로 의심 문장을 빠르게 고른다 (약·용량 / 위급한 몸 상태 / 마음 위기 / 저혈당).
+"""1단계: 규칙으로 의심 문장을 빠르게 고른다 (약·용량 / 위급한 몸 상태 / 마음 위기 / 폭력 / 저혈당).
 
 규칙은 일부러 넓게 잡는다. 약·용량은 2단계(GPT)가 한 번 더 걸러 준다.
-위급·마음 위기·저혈당은 놓치는 것이 더 위험하므로 GPT에 묻지 않고 그대로 알린다.
+위급·마음 위기·폭력·저혈당은 놓치는 것이 더 위험하므로 GPT에 묻지 않고 그대로 알린다.
 """
 
 import re
 from dataclasses import dataclass
 from typing import Literal
 
-Kind = Literal["DOSE", "URGENT_MEDICAL", "MIND", "LOW_GLUCOSE"]
+Kind = Literal["DOSE", "URGENT_MEDICAL", "MIND", "SAFETY", "LOW_GLUCOSE"]
 
 # 임신성 당뇨 산모 글에 자주 나오는 약 이름 (늘리고 싶으면 여기만 고친다)
 DRUG_NAMES = (
@@ -69,6 +69,35 @@ MIND = re.compile(
     r"|(?:내가|나만?|제가)\s*없으면\s*(?:다들|모두)?\s*편"
     r"|(?:나를|날|스스로를?)\s*해(?:치|칠)|해치고\s*싶"
 )
+# 폭력·위협 (be RiskSignalRules.SAFETY + 「누구한테 맞았어」)
+# 마음 위기(109)가 아니라 112·1366 안내로 가야 한다 (챗봇 평가 C38 「남편이 때려」)
+# 「때려치우다」「때려잡다」는 뺀다
+# 「맞았」은 「주사·인슐린 맞았」과 겹쳐서 사람(남편·애인·가족·누구) + 한테·에게 바로 뒤만 본다
+PERSON = (
+    r"(?:남편|신랑|남친|남자\s*친구|애인|가족|시어머니|시아버지|시댁|친정|엄마|아빠"
+    r"|오빠|형|언니|누나|누구|누군가|그\s*사람)"
+)
+SAFETY = re.compile(
+    r"때려(?!\s*[치잡])|때렸|때린|때리(?:고|는|면)|폭력|폭행|협박|목을\s*졸"
+    + r"|"
+    + PERSON
+    + r"\s*(?:한테서?|에게서?)\s*(?:(?:또|자꾸|계속|많이|막|매일|맨날|세게|심하게)\s*)?"
+    r"맞(?:았|아서|고\s*있)"
+)
+# 「아기가 배를 발로 때리는 느낌」은 태동이라 뺀다
+# 「남편이 발로 때렸어」처럼 사람이 주어면 빼지 않는다 (「엄마 배를」은 주어가 아님)
+FETAL_KICK = re.compile(
+    r"(?:아기|애기|태아|뱃속|태동)(?:가|이|는)?\s*(?:\S+\s*){0,3}?때(?:리|려|렸)"
+)
+HAS_PERSON = re.compile(PERSON + r"\s*(?:이|가|는|도|한테|에게)")
+
+
+def _is_violence(sentence: str) -> bool:
+    if not SAFETY.search(sentence):
+        return False
+    return not (FETAL_KICK.search(sentence) and not HAS_PERSON.search(sentence))
+
+
 # 저혈당일 수 있는 말 (U-30c) — 인슐린을 쓰는 산모에게 가장 흔한 위급.
 # 처치법은 앱이 말하지 않는다 → 종류만 알리고 화면은 「병원에서 배운 대로 + 119」
 # 챗봇 be RiskSignalRules.HYPO와 같은 목록 — 한쪽을 고치면 다른 쪽도
@@ -110,13 +139,17 @@ def _is_dose(sentence: str) -> bool:
 
 
 def classify(sentence: str) -> list[Kind]:
-    """한 문장의 종류. 여러 개면 위험한 쪽(마음 위기 > 위급 > 저혈당 > 약·용량) 하나를 고른다.
+    """한 문장의 종류. 여러 개면 위험한 쪽 하나를 고른다.
+
+    순서: 마음 위기 > 폭력 > 위급 > 저혈당 > 약·용량.
 
     저혈당만은 약·용량도 같이 본다
     — 「란투스 10단위 맞았는데 혈당 65」에서 용량 안내(U-15)가 가려지지 않게.
     """
     if MIND.search(sentence):
         return ["MIND"]
+    if _is_violence(sentence):
+        return ["SAFETY"]
     if URGENT.search(sentence):
         return ["URGENT_MEDICAL"]
     if LOW_GLUCOSE.search(sentence):

@@ -28,7 +28,7 @@ class PostCheckRequest(BaseModel):
 
 
 class Issue(BaseModel):
-    kind: Literal["DOSE", "URGENT_MEDICAL", "MIND", "LOW_GLUCOSE"]
+    kind: Literal["DOSE", "URGENT_MEDICAL", "MIND", "SAFETY", "LOW_GLUCOSE"]
     quote: str
 
 

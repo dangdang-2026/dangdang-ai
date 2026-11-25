@@ -220,3 +220,34 @@ def test_저혈당과_약_용량이_한_문장에_있으면_둘_다(client, cont
 def test_마음_위기는_내가_없으면만(client):
     assert [i["kind"] for i in check(client, "내가 없으면 다들 편할 텐데")["issues"]] == ["MIND"]
     assert check(client, "엄마 없으면 편해요.")["issues"] == []
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "남편이 때려요.",
+        "남편이 때렸어요.",
+        "어제 남편한테 또 맞았어요.",
+        "애인한테 맞았어.",
+        "남편이 발로 때렸어요.",  # 「발로」가 있어도 사람이 때리면 폭력
+        "남편이 배를 발로 때려서 아기가 걱정돼요.",
+    ],
+)
+def test_누가_때리거나_맞았으면_마음_위기가_아니라_SAFETY(client, content):
+    # 폭력 피해에 자살예방(109) 안내가 나가면 안 된다 (챗봇 평가 C38)
+    assert [i["kind"] for i in check(client, content)["issues"]] == ["SAFETY"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "아기가 배를 발로 때리는 느낌이에요.",
+        "애기가 발로 뻥뻥 때려요.",
+        "아기가 엄마 배를 발로 때려요.",
+        "인슐린 맞았는데 주사 자리가 멍들었어요.",
+        "회사 때려치우고 싶어요.",
+        "남편한테 물어보는 게 맞아요?",
+    ],
+)
+def test_태동_주사_때려치우기는_폭력이_아니다(client, content):
+    assert check(client, content)["issues"] == []
