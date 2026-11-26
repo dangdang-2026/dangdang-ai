@@ -37,6 +37,17 @@ class FakePredictor:
         return [Candidate(name=name, confidence=0.8)]
 
 
+class EggPredictor:
+    """식약처 이름과 꼴이 다른 AI 이름을 내는 가짜 모델"""
+
+    def predict_image(self, image: Image.Image) -> list[Candidate]:
+        return [
+            Candidate(name="계란찜", confidence=0.93),
+            Candidate(name="계란말이", confidence=0.04),
+            Candidate(name="김치찌개", confidence=0.02),
+        ]
+
+
 class FakeDetector:
     def __init__(self, boxes: list[Box]) -> None:
         self.boxes = boxes
@@ -91,7 +102,19 @@ def test_photo_returns_three_candidates(client):
     assert response.status_code == 200
     candidates = response.json()["candidates"]
     assert len(candidates) == 3
-    assert candidates[0] == {"name": "김밥", "confidence": 0.9}
+    # searchName: 식약처에서 찾을 이름. 대응표에 없으면 name 그대로 (#44)
+    assert candidates[0] == {"name": "김밥", "confidence": 0.9, "searchName": "김밥"}
+
+
+def test_name_differs_from_food_db_gives_search_name(client):
+    """식약처 이름 꼴이 다르면 searchName만 바꾼다. 화면에 보일 name은 그대로 (#44)"""
+    app.dependency_overrides[get_predictor] = lambda: EggPredictor()
+
+    candidates = post(client, jpeg_bytes()).json()["candidates"]
+
+    assert candidates[0] == {"name": "계란찜", "confidence": 0.93, "searchName": "달걀찜"}
+    assert candidates[1]["searchName"] == "달걀말이"
+    assert candidates[2]["searchName"] == "김치찌개"  # 표에 없으면 그대로
 
 
 def test_without_detector_whole_photo_is_one_item(client):
