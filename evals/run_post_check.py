@@ -25,7 +25,10 @@ def evaluate(client: TestClient, cases: list[dict]) -> tuple[dict, list[dict]]:
     rows = []
     for case in cases:
         title = case.get("title", "")
-        res = client.post("/internal/post-check", json={"title": title, "content": case["content"]})
+        res = client.post(
+            "/internal/post-check",
+            json={"title": title, "content": case["content"], "allowLlm": True},
+        )  # 동의한 사용자처럼 GPT까지 부른다 (#34부터 이 값이 없으면 규칙만)
         res.raise_for_status()  # 글 감지는 GPT가 실패해도 규칙 결과로 200이 온다
         body = res.json()
         got = sorted({issue["kind"] for issue in body["issues"]})
