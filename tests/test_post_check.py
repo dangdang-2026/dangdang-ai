@@ -30,8 +30,11 @@ def client(monkeypatch):
 
 
 def check(client, content, title=""):
+    # 동의한 사람의 요청 (GPT 확인까지 보는 테스트들). 동의 없는 경우는 아래에서 따로
     response = client.post(
-        "/internal/post-check", json={"title": title, "content": content}, headers=HEADERS
+        "/internal/post-check",
+        json={"title": title, "content": content, "allowLlm": True},
+        headers=HEADERS,
     )
     assert response.status_code == 200
     return response.json()
@@ -97,6 +100,154 @@ def test_위급_문장은_GPT에_묻지_않는다(client):
     assert fake.asked == []
 
 
+def test_동의가_없으면_GPT에_안_묻고_규칙만(client):
+    fake = FakeChecker([False])
+    app.dependency_overrides[get_dose_checker] = lambda: fake
+    response = client.post(
+        "/internal/post-check",
+        json={"content": "인슐린 4단위 맞아요.", "allowLlm": False},
+        headers=HEADERS,
+    )
+    body = response.json()
+    assert fake.asked == []
+    assert body["llmChecked"] is False
+    assert [i["kind"] for i in body["issues"]] == ["DOSE"]
+
+
+def test_allowLlm을_안_보내면_GPT에_안_묻고_규칙만(client):
+    fake = FakeChecker([False])
+    app.dependency_overrides[get_dose_checker] = lambda: fake
+    response = client.post(
+        "/internal/post-check", json={"content": "인슐린 4단위 맞아요."}, headers=HEADERS
+    )
+    body = response.json()
+    assert fake.asked == []
+    assert body["llmChecked"] is False
+    assert [i["kind"] for i in body["issues"]] == ["DOSE"]
+
+
 def test_본문이_비면_422(client):
     response = client.post("/internal/post-check", json={"content": ""}, headers=HEADERS)
     assert response.status_code == 422
+
+
+# ── 저혈당 (U-30c) — 문장은 be RiskSignalRulesTest와 같은 목록 ──
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "손이 떨리고 식은땀이 나요.",
+        "방금 혈당 52 나왔어요.",
+        "저혈당 온 것 같아요.",
+        "인슐린 맞고 한 시간 뒤에 손이 덜덜 떨렸어요.",
+        "재 보니 62예요.",
+    ],
+)
+def test_저혈당일_수_있는_말은_LOW_GLUCOSE(client, content):
+    assert [i["kind"] for i in check(client, content)["issues"]] == ["LOW_GLUCOSE"]
+
+
+def test_혈당_세_자리나_분은_저혈당이_아니다(client):
+    assert check(client, "식후 혈당 128 나왔어요.")["issues"] == []
+    assert check(client, "혈당 60분 뒤에 쟀어요.")["issues"] == []
+    assert check(client, "혈당 10월 1일부터 기록했어요.")["issues"] == []
+
+
+def test_의식이_흐려지면_저혈당보다_위급이_먼저(client):
+    body = check(client, "식은땀이 나고 의식이 흐려져요.")
+    assert [i["kind"] for i in body["issues"]] == ["URGENT_MEDICAL"]
+
+
+def test_저혈당_문장은_GPT에_묻지_않는다(client):
+    fake = FakeChecker(answer=[False])
+    app.dependency_overrides[get_dose_checker] = lambda: fake
+    body = check(client, "방금 혈당 52 나왔어요.")
+    assert [i["kind"] for i in body["issues"]] == ["LOW_GLUCOSE"]
+    assert fake.asked == []
+
+
+# ── 11/25 리뷰에서 찾은 말 — be RiskSignalRulesTest와 같은 문장, 같은 결과 ──
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["피가 너무 많이 나요.", "피 나요.", "갈색 피비침이 있어요."],
+)
+def test_출혈은_부사가_둘이어도_피비침도_위급(client, content):
+    assert [i["kind"] for i in check(client, content)["issues"]] == ["URGENT_MEDICAL"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["혈당이 너무 낮아요 어지러워요.", "혈당이 떨어져서 어지러워요.", "혈당 65mg/dL 나왔어요."],
+)
+def test_혈당이_낮다_떨어졌다도_저혈당(client, content):
+    assert [i["kind"] for i in check(client, content)["issues"]] == ["LOW_GLUCOSE"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "혈당 측정기 15만원이에요.",
+        "혈당 측정 30초면 끝나요.",
+        "혈당 관리하는 50대예요.",
+        "혈당 낮추는 법 알려 주세요.",
+        "혈당 떨어뜨리는 음식 있나요?",
+        "커피 나와요.",
+        "피가 나아졌어요.",
+        "회사 다 그만두고 싶어요.",
+    ],
+)
+def test_돈_시간_나이와_흔한_말은_안_걸린다(client, content):
+    assert check(client, content)["issues"] == []
+
+
+def test_혈당_뒤_약_용량은_저혈당이_아니라_약_용량(client):
+    body = check(client, "혈당 쟀는데 인슐린 12단위 맞아야 해?")
+    assert [i["kind"] for i in body["issues"]] == ["DOSE"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["란투스 10단위 맞았는데 혈당 65 나왔어요.", "인슐린 4단위 맞고 손이 떨려요."],
+)
+def test_저혈당과_약_용량이_한_문장에_있으면_둘_다(client, content):
+    kinds = [i["kind"] for i in check(client, content)["issues"]]
+    assert kinds == ["LOW_GLUCOSE", "DOSE"]
+
+
+def test_마음_위기는_내가_없으면만(client):
+    assert [i["kind"] for i in check(client, "내가 없으면 다들 편할 텐데")["issues"]] == ["MIND"]
+    assert check(client, "엄마 없으면 편해요.")["issues"] == []
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "남편이 때려요.",
+        "남편이 때렸어요.",
+        "어제 남편한테 또 맞았어요.",
+        "애인한테 맞았어.",
+        "남편이 발로 때렸어요.",  # 「발로」가 있어도 사람이 때리면 폭력
+        "남편이 배를 발로 때려서 아기가 걱정돼요.",
+    ],
+)
+def test_누가_때리거나_맞았으면_마음_위기가_아니라_SAFETY(client, content):
+    # 폭력 피해에 자살예방(109) 안내가 나가면 안 된다 (챗봇 평가 C38)
+    assert [i["kind"] for i in check(client, content)["issues"]] == ["SAFETY"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "아기가 배를 발로 때리는 느낌이에요.",
+        "애기가 발로 뻥뻥 때려요.",
+        "아기가 엄마 배를 발로 때려요.",
+        "인슐린 맞았는데 주사 자리가 멍들었어요.",
+        "회사 때려치우고 싶어요.",
+        "남편한테 물어보는 게 맞아요?",
+    ],
+)
+def test_태동_주사_때려치우기는_폭력이_아니다(client, content):
+    assert check(client, content)["issues"] == []

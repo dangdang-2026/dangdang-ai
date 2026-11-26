@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import onnxruntime as ort
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel
 
 from app.food.preprocess import preprocess
@@ -23,18 +23,25 @@ class NotAnImageError(Exception):
     pass
 
 
+def open_image(image_bytes: bytes) -> Image.Image:
+    """디스크에 저장하지 않고 메모리에서만 연다. 폰 사진 회전을 바로잡아 화면에 보이는 방향으로"""
+    try:
+        image = Image.open(io.BytesIO(image_bytes))
+        image.load()
+    except (UnidentifiedImageError, OSError) as e:
+        raise NotAnImageError from e
+    return ImageOps.exif_transpose(image).convert("RGB")
+
+
 class FoodPredictor:
     def __init__(self, model_path: Path, labels_path: Path) -> None:
         self.session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
         self.labels: list[str] = json.loads(labels_path.read_text("utf-8"))
 
     def predict(self, image_bytes: bytes) -> list[Candidate]:
-        try:
-            image = Image.open(io.BytesIO(image_bytes))  # 디스크에 저장하지 않고 메모리에서만
-            image.load()
-        except (UnidentifiedImageError, OSError) as e:
-            raise NotAnImageError from e
+        return self.predict_image(open_image(image_bytes))
 
+    def predict_image(self, image: Image.Image) -> list[Candidate]:
         logits = self.session.run(None, {"image": preprocess(image)})[0][0]
         scores = np.exp(logits - logits.max())  # softmax: 점수 → 확률
         scores /= scores.sum()

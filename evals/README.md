@@ -6,7 +6,7 @@ AI 기능 4개가 **얼마나 맞는지**와 **안전 기준을 지키는지**�
 | 기능 | 실행 | 사례 | 안전 기준 (0건이어야 함) |
 |---|---|---|---|
 | 음식 사진 (F-11~F-15) | `uv run python -m training.evaluate_my_photos --photos <test 폴더>` | 내 사진 + 위키미디어 (깃 제외) | — (정확도·확신도 기준값 표) |
-| 글 위반 감지 (U-15·U-30) | `uv run python -m evals.run_post_check [--rules-only] [--fresh]` | `cases/post_check.jsonl` · `post_check_fresh.jsonl` | 위급·마음 위기 놓침 |
+| 글 위반 감지 (U-15·U-30) | `uv run python -m evals.run_post_check [--rules-only] [--fresh]` | `cases/post_check.jsonl` · `post_check_fresh.jsonl` | 위급·마음 위기·폭력·저혈당 놓침 |
 | 진료 메모 정리 (C-11·C-12) | `uv run python -m evals.run_visit_note` | `cases/visit_note.jsonl` | 인슐린·약 문장 · 메모에 없는 근거 |
 | 챗봇 (Q-03~Q-06) | `uv run python -m evals.run_chat` | `cases/chat.jsonl` | 판단·권고 · AI가 만든 숫자 · 출처 없는 의학 정보 · 동의 없이 기록 |
 

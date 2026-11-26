@@ -26,7 +26,9 @@ class NoteOrganizer(Protocol):
 
 
 class OrganizeRequest(BaseModel):
-    memo: str = Field(min_length=1, max_length=3000)
+    # Spring은 원문 3000자까지 받고, 이름·병원·전화번호를 [이름] 같은 자리표시로 바꿔 보낸다
+    # → 늘어날 몫만큼 여유
+    memo: str = Field(min_length=1, max_length=4000)
     visitDate: date  # 진료한 날 — 「2주 뒤」 계산 기준
 
 
