@@ -41,6 +41,21 @@ uv run python -m training.evaluate_my_photos --photos ~/04_Dev/dangdang/my-food/
 
 서버는 `models/food.onnx`·`models/labels.json` 두 파일만 쓴다.
 
+## 한상 사진: 그릇 찾기 모델
+
+한상 사진에서 그릇 자리를 먼저 찾고, 자리마다 잘라서 위의 150종 모델로 이름 후보를 낸다. 그릇 찾기는 학습하지 않고 OWL-ViT(`google/owlvit-base-patch32`, Apache-2.0)를 「음식이 담긴 그릇」 같은 말로 고정해서 쓴다. 빈 그릇, 컵, 병, 사람 점수가 더 높은 자리는 버린다.
+
+```bash
+# models/dish.onnx (int8, 약 150MB) · models/dish.json (깃 제외)
+uv run --group train python -m training.export_dish_detector
+```
+
+서버는 `models/dish.onnx`·`models/dish.json`이 있으면 그릇을 찾고, 없으면 예전처럼 사진 전체를 음식 하나로 본다. 서버에 올릴 때는 `food.onnx`와 같은 폴더에 두 파일을 함께 둔다.
+
+| 날짜 | 시험 | 결과 | 메모 |
+|---|---|---|---|
+| 2026-11-26 | 내 한상 사진 23장 | 그릇 자리는 대부분 맞게 찾음, 사진 1장 약 1초 (맥 CPU, 검출과 분류 합계) | 빈 그릇과 컵이 가끔 남아 「식혜」로 나옴. 잘라 낸 그릇의 이름은 사진 전체 분류보다 덜 맞음 (150종 모델이 그릇 하나만 찍은 사진으로 배워서) |
+
 ## 실험 기록
 
 | 날짜         | 데이터 | 종 | train / val | epoch | val Top-1 | val Top-3 | 메모 |
