@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from app.chat.router import router as chat_router
 from app.core.config import settings
 from app.embedding.router import router as embedding_router
+from app.food.detector import DishDetector
 from app.food.predictor import FoodPredictor
 from app.food.router import router as food_router
 from app.moderation.router import router as moderation_router
@@ -21,6 +22,12 @@ async def lifespan(app: FastAPI):
         app.state.food_predictor = FoodPredictor(model_path, labels_path)
     else:  # 모델이 없어도 서버는 켜지고, 사진 주소만 503
         app.state.food_predictor = None
+    dish_model_path = Path(settings.dish_model_path)
+    dish_config_path = Path(settings.dish_config_path)
+    if dish_model_path.exists() and dish_config_path.exists():
+        app.state.dish_detector = DishDetector(dish_model_path, dish_config_path)
+    else:  # 없으면 예전처럼 사진 전체를 음식 하나로 본다
+        app.state.dish_detector = None
     yield
 
 

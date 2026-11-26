@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     embedding_model: str = "text-embedding-3-small"
     food_model_path: str = "models/food.onnx"  # 4단계에서 만든 모델
     food_labels_path: str = "models/labels.json"  # 모델 번호 → 음식 이름
+    # 한상 사진에서 그릇 자리 찾기 (training/export_dish_detector.py)
+    # 없으면 사진 전체를 음식 하나로 본다
+    dish_model_path: str = "models/dish.onnx"
+    dish_config_path: str = "models/dish.json"  # 찾을 말, 입력 크기, 색 맞추기 값
 
 
 settings = Settings()
