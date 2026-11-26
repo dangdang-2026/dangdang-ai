@@ -7,16 +7,24 @@ from pathlib import Path
 import numpy as np
 import onnxruntime as ort
 from PIL import Image, ImageOps, UnidentifiedImageError
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 
+from app.food.db_names import search_name
 from app.food.preprocess import preprocess
 
 TOP_K = 3
 
 
 class Candidate(BaseModel):
-    name: str
+    name: str  # AI Hub 이름 (화면 칩에 보이는 이름)
     confidence: float  # 0~1, 3개를 더해도 1이 안 될 수 있다(나머지 음식 몫)
+
+    # 식약처 음식 DB에서 찾을 이름. 이름 꼴이 다르면 바꿔 준다 (계란찜 → 달걀찜, #44)
+    # 백엔드는 이 이름으로 검색한다
+    @computed_field(alias="searchName")
+    @property
+    def search_name(self) -> str:
+        return search_name(self.name)
 
 
 class NotAnImageError(Exception):
